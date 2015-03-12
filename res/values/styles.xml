@@ -16,5 +16,20 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
-
+ 
+    <style name="CustomButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">@drawable/custom_button</item>
+        <item name="android:textColor">@color/button_border</item>
+    </style>
+    
+    <style name="SubmitOrResignButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">right</item>
+        <item name="android:background">@drawable/sor_button</item>
+        <item name="android:textColor">@color/sor_border</item>
+    </style>
 </resources>

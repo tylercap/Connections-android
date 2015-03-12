@@ -2,7 +2,12 @@
 <resources>
 
     <string name="app_name">Connections</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    
+    <string name="resign">Resign</string>
+    <string name="submit">Submit</string>
 
+    <string name="banner_ad_id">ca-app-pub-8484316959485082/1776106053</string>
+    
+    <string name="games_app_id">320198239668</string>
 </resources>

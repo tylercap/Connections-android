@@ -1,16 +1,166 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.gmail.tylercap4.connections.Connections" >
+    android:orientation="vertical"
+    android:background="@color/back_color" >   
+       
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"        
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="@string/banner_ad_id"/>
+	       
+    <TableLayout
+        android:id="@+id/tableLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5" >
+        
+        <TableRow
+            android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+        	android:layout_weight="1" 
+        	android:stretchColumns="*">
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr0c0"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr0c1"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr0c2"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr0c3"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr0c4"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr0c5"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr0c6"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr0c7"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+        	android:layout_weight="1" 
+        	android:stretchColumns="*">
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr1c0"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr1c1"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr1c2"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr1c3"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr1c4"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr1c5"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr1c6"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr1c7"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+        	android:layout_weight="1" 
+        	android:stretchColumns="*">
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr2c0"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr2c1"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr2c2"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr2c3"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr2c4"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr2c5"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr2c6"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr2c7"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+        	android:layout_weight="1" 
+        	android:stretchColumns="*">
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr3c0"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr3c1"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr3c2"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr3c3"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr3c4"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr3c5"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr3c6"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr3c7"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+        	android:layout_weight="1" 
+        	android:stretchColumns="*">
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr4c0"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr4c1"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr4c2"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr4c3"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr4c4"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr4c5"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr4c6"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr4c7"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+        	android:layout_weight="1" 
+        	android:stretchColumns="*">
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr5c0"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr5c1"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr5c2"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr5c3"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr5c4"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr5c5"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr5c6"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr5c7"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+        	android:layout_weight="1" 
+        	android:stretchColumns="*">
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr6c0"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr6c1"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr6c2"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr6c3"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr6c4"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr6c5"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr6c6"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr6c7"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+        	android:layout_weight="1" 
+        	android:stretchColumns="*">
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr7c0"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr7c1"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr7c2"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr7c3"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr7c4"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr7c5"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr7c6"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr7c7"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+        	android:layout_weight="1" 
+        	android:stretchColumns="*">
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr8c0"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr8c1"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr8c2"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr8c3"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr8c4"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr8c5"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr8c6"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/widgetr8c7"/>
+        </TableRow>    
+        <TableRow
+            android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+        	android:layout_weight="1" 
+        	android:stretchColumns="*">
+        	<FrameLayout android:layout_weight="1" android:id="@+id/playerCard0"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/playerCard1"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/playerCard2"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/playerCard3"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/playerCard4"/>
+        	<FrameLayout android:layout_weight="1" android:id="@+id/playerCard5"/>
+	        <Button
+		        android:id="@+id/sorButton"
+		        android:text="@string/resign"
+	    		style="@style/SubmitOrResignButton" />
+        </TableRow>
+    </TableLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
-
-</RelativeLayout>
+</LinearLayout>
