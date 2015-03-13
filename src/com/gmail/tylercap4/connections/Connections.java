@@ -92,20 +92,11 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     private void setUpButton( Button button, int value ){
     	button.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,TableRow.LayoutParams.MATCH_PARENT, 1.0f));
 		button.setBackgroundResource(R.drawable.custom_button);
-		//button.setTextColor(this.text_color);
-		
-		if( value == -1 ){
-			int unicode = 0x1F60A;
-			button.setText(getEmojiByUnicode(unicode));
-		}
-		else{
-			button.setText(String.valueOf(value));
-		}
-    }
 
-	private String getEmojiByUnicode(int unicode){
-	    return new String(Character.toChars(unicode));
-	}
+		//TODO: increase font size
+		
+		button.setText(getEmoji(value));
+    }
 
     
 	private void doNewGame(){
@@ -144,7 +135,7 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     			FrameLayout view = (FrameLayout)findViewById(player_card_ids[i]);
     			
     			Button child = new Button(this);
-            	setUpButton( child, -1 );
+            	setUpButton( child, -2 + (i % 2) );
     			if( view.getChildCount() > 0 )
     				view.removeAllViews();
     			
@@ -219,6 +210,130 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 //            }
 //        }
     }
+    
+
+
+	private String getEmoji(int value){
+		int unicode;
+		
+		switch( value ){
+			case -1:
+				unicode = 0x26A1; // lightning
+				break;
+			case -2:
+				unicode = 0x1F340; // four leaf clover
+				break;
+			case 1:
+				unicode = 0x1F3C8;
+				break;
+			case 2:
+				unicode = 0x1F4A9;
+				break;
+			case 3:
+				unicode = 0x1F431;
+				break;
+			case 4:
+				unicode = 0x1F680;
+				break;
+			case 5:
+				unicode = 0x1F3C0;
+				break;
+			case 6:
+				unicode = 0x1F64A;
+				break;
+			case 7:
+				unicode = 0x1F3AF;
+				break;
+			case 8:
+				unicode = 0x1F385;
+				break;
+			case 9:
+				unicode = 0x0231B;
+				break;
+			case 10:
+				unicode = 0x023F0;
+				break;
+			case 11:
+				unicode = 0x02600;
+				break;
+			case 12:
+				unicode = 0x02614;
+				break;
+			case 13:
+				unicode = 0x02615;
+				break;
+			case 14:
+				unicode = 0x1F364;
+				break;
+			case 15:
+				unicode = 0x026BD;
+				break;
+			case 16:
+				unicode = 0x1F383;
+				break;
+			case 17:
+				unicode = 0x026F3;
+				break;
+			case 18:
+				unicode = 0x1F37B;
+				break;
+			case 19:
+				unicode = 0x1F36A;
+				break;
+			case 20:
+				unicode = 0x1F335;
+				break;
+			case 21:
+				unicode = 0x1F339;
+				break;
+			case 22:
+				unicode = 0x1F33B;
+				break;
+			case 23:
+				unicode = 0x1F33D;
+				break;
+			case 24:
+				unicode = 0x1F369;
+				break;
+			case 25:
+				unicode = 0x1F344;
+				break;
+			case 26:
+				unicode = 0x1F346;
+				break;
+			case 27:
+				unicode = 0x1F347;
+				break;
+			case 28:
+				unicode = 0x1F349;
+				break;
+			case 29:
+				unicode = 0x1F34A;
+				break;
+			case 30:
+				unicode = 0x1F34D;
+				break;
+			case 31:
+				unicode = 0x1F352;
+				break;
+			case 32:
+				unicode = 0x1F354;
+				break;
+			case 33:
+				unicode = 0x1F355;
+				break;
+			case 34:
+				unicode = 0x1F357;
+				break;
+			case 35:
+				unicode = 0x1F35F;
+				break;
+			default:
+				unicode = 0x1F603;
+		}
+		
+	    return new String(Character.toChars(unicode));
+	}
     
     private void initWidgetIds(){
     	player_card_ids [0] = R.id.playerCard0;
