@@ -92,8 +92,6 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     private void setUpButton( Button button, int value ){
     	button.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,TableRow.LayoutParams.MATCH_PARENT, 1.0f));
 		button.setBackgroundResource(R.drawable.custom_button);
-
-		//TODO: increase font size
 		
 		button.setText(getEmoji(value));
     }
@@ -217,10 +215,10 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 		int unicode;
 		
 		switch( value ){
-			case -1:
+			case -2:
 				unicode = 0x26A1; // lightning
 				break;
-			case -2:
+			case -1:
 				unicode = 0x1F340; // four leaf clover
 				break;
 			case 1:
