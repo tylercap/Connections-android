@@ -1,7 +1,7 @@
 # view AndroidManifest.xml #generated:22
 -keep class com.gmail.tylercap4.connections.Connections { <init>(...); }
 
-# view AndroidManifest.xml #generated:31
+# view AndroidManifest.xml #generated:32
 -keep class com.google.android.gms.ads.AdActivity { <init>(...); }
 
 # view res/layout/activity_connections.xml #generated:9
