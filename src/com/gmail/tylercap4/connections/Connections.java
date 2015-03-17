@@ -12,6 +12,7 @@ import com.google.android.gms.games.Games;
 import com.google.android.gms.plus.Plus;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +30,8 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 	private int [] player_card_ids;
 	
 	private int [][] 			gameboard;
+	private int [][] 			owner_vals;
+	
 	private IndexedButton [][] 	widgets;
 	
 	/* Client used to interact with Google APIs. */
@@ -82,6 +85,8 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 			player_card_ids = new int[6];
 			
 			gameboard = new int[9][8];
+			owner_vals = new int[9][8];
+			
 			widgets = new IndexedButton[9][8];
 			
 			initWidgetIds();
@@ -89,9 +94,21 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 		}
 	}
 
-    private void setUpButton( Button button, int value ){
+    private void setUpButton( Button button, int value, int owner ){
     	button.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,TableRow.LayoutParams.MATCH_PARENT, 1.0f));
 		button.setBackgroundResource(R.drawable.custom_button);
+		
+		switch( owner ){
+			case 1:
+				button.setBackgroundResource(R.drawable.player1);
+				break;
+			case 2:
+				button.setBackgroundResource(R.drawable.player2);
+				break;
+			default:
+				button.setBackgroundResource(R.drawable.custom_button);
+				break;
+		}
 		
 		button.setText(getEmoji(value));
     }
@@ -119,7 +136,9 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 	    			
 	    			FrameLayout view = (FrameLayout)findViewById(widget_ids[row][column]);
 	    			IndexedButton button = new IndexedButton(this, row, column);
-	    			setUpButton(button, val);
+	    			
+	    			int owner = owner_vals[row][column];
+	    			setUpButton(button, val, owner);
 	            	
 	    			if( view.getChildCount() > 0 )
 	    				view.removeAllViews();
@@ -133,7 +152,7 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     			FrameLayout view = (FrameLayout)findViewById(player_card_ids[i]);
     			
     			Button child = new Button(this);
-            	setUpButton( child, -2 + (i % 2) );
+            	setUpButton( child, -2 + (i % 2), 1 );
     			if( view.getChildCount() > 0 )
     				view.removeAllViews();
     			
