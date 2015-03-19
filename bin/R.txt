@@ -110,7 +110,6 @@ int drawable player2 0x7f020022
 int drawable powered_by_google_dark 0x7f020023
 int drawable powered_by_google_light 0x7f020024
 int drawable sor_button 0x7f020025
-int id action_settings 0x7f070069
 int id adView 0x7f070017
 int id adjust_height 0x7f070002
 int id adjust_width 0x7f070001
@@ -218,7 +217,6 @@ int id widgetr8c7 0x7f070060
 int id wrap_content 0x7f07000f
 int integer google_play_services_version 0x7f090000
 int layout activity_connections 0x7f030000
-int menu connections 0x7f0b0000
 int raw gtm_analytics 0x7f040000
 int string accept 0x7f060002
 int string action_settings 0x7f060024
@@ -261,9 +259,8 @@ int string store_picture_message 0x7f060001
 int string store_picture_title 0x7f060000
 int string submit 0x7f060026
 int string wallet_buy_button_place_holder 0x7f060022
-int style AppBaseTheme 0x7f050005
-int style AppTheme 0x7f050006
-int style SubmitOrResignButton 0x7f050007
+int style AppTheme 0x7f050005
+int style SubmitOrResignButton 0x7f050006
 int style Theme_IAPTheme 0x7f050000
 int style WalletFragmentDefaultButtonTextAppearance 0x7f050003
 int style WalletFragmentDefaultDetailsHeaderTextAppearance 0x7f050002

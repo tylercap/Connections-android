@@ -13,8 +13,10 @@ import com.google.android.gms.plus.Plus;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.TypedValue;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TableRow;
@@ -33,6 +35,7 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 	private int [][] 			owner_vals;
 	
 	private IndexedButton [][] 	widgets;
+	private IndexedButton [] 	player_cards;
 	
 	/* Client used to interact with Google APIs. */
 	private GoogleApiClient mGoogleApiClient;
@@ -81,13 +84,14 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 //		}
 
 		if( gameboard == null ){
-			widget_ids = new int[9][8];
-			player_card_ids = new int[6];
+			widget_ids = new int[ROWS][COLUMNS];
+			player_card_ids = new int[PLAYER_CARDS];
 			
-			gameboard = new int[9][8];
-			owner_vals = new int[9][8];
+			gameboard = new int[ROWS][COLUMNS];
+			owner_vals = new int[ROWS][COLUMNS];
 			
-			widgets = new IndexedButton[9][8];
+			widgets = new IndexedButton[ROWS][COLUMNS];
+			player_cards = new IndexedButton[PLAYER_CARDS];
 			
 			initWidgetIds();
 			doNewGame();
@@ -112,6 +116,9 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     private void setUpButton( Button button, int value, int owner ){
     	button.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,TableRow.LayoutParams.MATCH_PARENT, 1.0f));
 		button.setBackgroundResource(R.drawable.custom_button);
+		button.setOnTouchListener(new TileTouchListener());
+		
+		button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
 		
 		switch( owner ){
 			case 1:
@@ -133,14 +140,14 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     	synchronized( this ){
 	    	LinkedList<Integer> list = new LinkedList<Integer>();
 	    	
-	    	for( int val = 0; val <= 36; val++ ){
+	    	for( int val = 0; val <= (ROWS * COLUMNS / 2); val++ ){
 		    	for( int i = 0; i < 2; i++ ){
 		    		list.add(val);
 		    	}
 	    	}
 	    	
 	    	// now fill the table from the list
-	    	int remaining = 72;
+	    	int remaining = ROWS * COLUMNS;
 	    	for(int row = 0; row < ROWS; row++ ){    		
 	    		for( int column = 0; column < COLUMNS; column++ ){
 	    			int index = (int) (Math.random() * remaining);
@@ -150,7 +157,7 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 	    			gameboard[row][column] = val;
 	    			
 	    			FrameLayout view = (FrameLayout)findViewById(widget_ids[row][column]);
-	    			IndexedButton button = new IndexedButton(this, row, column);
+	    			IndexedButton button = new IndexedButton(this, row, column, val);
 	    			
 	    			int owner = owner_vals[row][column];
 	    			setUpButton(button, val, owner);
@@ -166,34 +173,17 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 	    	for( int i = 0; i < PLAYER_CARDS; i++ ){    			
     			FrameLayout view = (FrameLayout)findViewById(player_card_ids[i]);
     			
-    			Button child = new Button(this);
-            	setUpButton( child, -2 + (i % 2), 1 );
+    			int val = (int) (Math.random() * 38) - 2;
+    			IndexedButton child = new IndexedButton(this, -1, i, val);
+            	setUpButton( child, val, 1 );
     			if( view.getChildCount() > 0 )
     				view.removeAllViews();
     			
             	view.addView(child);
+            	player_cards[i] = child;
 	    	}
     	}
     }
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.connections, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
 
 	@Override
     public void onConnected(Bundle connectionHint) {
@@ -243,7 +233,43 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 //        }
     }
     
-
+    protected LinkedList<IndexedButton> getEligibleDropTargets( int value ){
+    	LinkedList<IndexedButton> eligible = new LinkedList<IndexedButton>();
+    	
+    	synchronized( Connections.this ){
+    		for( int row = 0; row < ROWS; row++ ){
+    			for( int col = 0; col < COLUMNS; col++ ){
+		    		if( gameboard[row][col] == value ){
+			    		// can't move a blank piece
+		    			eligible.add(widgets[row][col]);
+			    	}
+    			}
+    		}
+    		return eligible;
+    	}
+    }
+    
+    private final class TileTouchListener implements OnTouchListener 
+    {
+        @Override
+	    public boolean onTouch(View view, MotionEvent motionEvent) {
+        	if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+        		synchronized( Connections.this ){				        
+			        IndexedButton button = (IndexedButton)view;
+			        if( button.getRow() < 0 ){
+				        for( IndexedButton eligible:getEligibleDropTargets(button.getValue()) ){
+				        	if( eligible != null )
+				        		eligible.setHighlighted();
+				        }	
+			        }
+        		}
+        		
+		        return true;
+		    } 
+        	
+        	return false;
+        }
+    }
 
 	private String getEmoji(int value){
 		int unicode;
