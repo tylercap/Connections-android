@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="button_back">#FDFDFD</color>
-    <color name="player1_back">#0000FF</color>
-    <color name="player2_back">#FF0000</color>
+    <color name="player1_back">#3360FF</color>
+    <color name="player2_back">#FF4033</color>
+    <color name="highlight_back">#DDFF1C</color>
     <color name="button_border">#000000</color>
     <color name="back_color">#4C4C4C</color>
     <color name="sor_back">#00CC01</color>

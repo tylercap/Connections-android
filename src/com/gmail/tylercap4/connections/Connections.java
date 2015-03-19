@@ -12,13 +12,13 @@ import com.google.android.gms.games.Games;
 import com.google.android.gms.plus.Plus;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 
 public class Connections extends Activity implements ConnectionCallbacks, OnConnectionFailedListener
 {
@@ -92,6 +92,21 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 			initWidgetIds();
 			doNewGame();
 		}
+		showHowTo();
+	}
+	
+	private void showHowTo()
+	{
+	    String line1= "Get 5 tiles in a row vertically, horizontally, or diagonally to win.";
+	    
+	    String lightning = getEmoji(-2);
+	    String clover = getEmoji(-1);
+	    
+	    String line2 = clover + " is a wild that can be placed on any open space.";
+	    String line3 = lightning + "can open up any space that your opponent occupies.";
+	    
+	    TextView desc = (TextView)findViewById(R.id.description);
+	    desc.setText(line1 + "\n" + line2 + "\n" + line3);
 	}
 
     private void setUpButton( Button button, int value, int owner ){
