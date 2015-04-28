@@ -9,11 +9,8 @@
     <string name="resign">Resign</string>
     <string name="submit">Submit</string>
 
-    <string name="banner_ad_id">ca-app-pub-8484316959485082/1776106053</string>
-    
-    <string name="games_app_id">320198239668</string>
-    
-    
+    <string name="banner_ad_id">ca-app-pub-8484316959485082/2150010457</string>    
+    <string name="games_app_id">317322985582</string>        
     
     <string name="sign_in_failed">Failed to sign in. Please check your network connection and try again.</string>
     <string name="app_misconfigured">The application is incorrectly configured. Check that the package name and signing certificate match the client ID created in Developer Console. Also, if the application is not yet published, check that the account you are trying to sign in with is listed as a tester account. See logs for more information.</string>

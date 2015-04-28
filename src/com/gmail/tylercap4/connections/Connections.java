@@ -230,13 +230,13 @@ public class Connections extends Activity
     	if( winner ){
     		new AlertDialog.Builder(this)
 	    	    .setTitle("You Won!")
-	    	    .setMessage("Would you like to start a rematch?")
-	    	    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	    	    .setMessage("Would you like to challenge your opponent to a rematch?")
+	    	    .setPositiveButton("Rematch", new DialogInterface.OnClickListener() {
 	    	        public void onClick(DialogInterface dialog, int which) { 
 	    	            //TODO: continue with rematch
 	    	        }
 	    	     })
-	    	    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+	    	    .setNegativeButton("Close", new DialogInterface.OnClickListener() {
 	    	        public void onClick(DialogInterface dialog, int which) { 
 	    	            // do nothing
 	    	        }
