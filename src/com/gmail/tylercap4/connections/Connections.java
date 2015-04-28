@@ -1,45 +1,48 @@
 package com.gmail.tylercap4.connections;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.games.Games;
-import com.google.android.gms.plus.Plus;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
-public class Connections extends Activity implements ConnectionCallbacks, OnConnectionFailedListener
-{
-	private static final int ROWS = 9;
-	private static final int COLUMNS = 8;
-	private static final int PLAYER_CARDS = 6;
+public class Connections extends Activity
+{		
+	public static final int ROWS = 9;
+	public static final int COLUMNS = 8;
+	public static final int PLAYER_CARDS = 6;
+
+    private AdView adMobView;
+    
+	private TurnBasedMultiplayer multiplayer;
+	private TurnBasedMatch match;
+	private int owner = 1;
 	
 	private int [][] widget_ids;
 	private int [] player_card_ids;
 	
-	private int [][] 			gameboard;
-	private int [][] 			owner_vals;
-	
 	private IndexedButton [][] 	widgets;
 	private IndexedButton [] 	player_cards;
 	
-	/* Client used to interact with Google APIs. */
-	private GoogleApiClient mGoogleApiClient;
-    private AdView adMobView;
+	private int [][] 			gameboard;
+	private int [][] 			owner_vals;
+	
+	private LinkedList<Integer> deck;
+	private int[]				owner1_cards;
+	private int[]				owner2_cards;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,39 +52,18 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 		// Load the banner ad
         adMobView = (AdView) findViewById(R.id.adView);
         adMobView.loadAd(new AdRequest.Builder().build());
-        
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-		        .addConnectionCallbacks(this)
-		        .addOnConnectionFailedListener(this)
-		        .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
-                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-                .build();
 	}
+    
+    @Override
+    protected void onPause(){
+    	super.onPause();
+        adMobView.pause();
+    }
 	
 	@Override
 	protected void onResume(){
 		super.onResume();
-		adMobView.resume();
-
-//		if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-//			findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-//
-//			final View signOutLayout = findViewById(R.id.sign_out_layout);
-//			final TextView user_view = (TextView) findViewById(R.id.current_user);
-//
-//			// show email for user signed in
-//			String username = Plus.AccountApi.getAccountName(mGoogleApiClient);
-//			if( username != null )
-//				user_view.setText(username);
-//
-//			signOutLayout.setVisibility(View.VISIBLE);
-//			findViewById(R.id.leaderboard_button).setVisibility(View.VISIBLE);
-//		}
-//		else{
-//			findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-//			findViewById(R.id.sign_out_layout).setVisibility(View.GONE);
-//			findViewById(R.id.leaderboard_button).setVisibility(View.GONE);
-//		}
+        adMobView.resume();
 
 		if( gameboard == null ){
 			widget_ids = new int[ROWS][COLUMNS];
@@ -93,13 +75,79 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 			widgets = new IndexedButton[ROWS][COLUMNS];
 			player_cards = new IndexedButton[PLAYER_CARDS];
 			
+			owner1_cards = new int[PLAYER_CARDS];
+			owner2_cards = new int[PLAYER_CARDS];
+			
 			initWidgetIds();
+		}
+		
+		if( match == null || match.getData() == null ){
 			doNewGame();
 		}
-		showHowTo();
+		else{
+			loadFromMatch();
+		}
+		
+		addHowToText();
 	}
 	
-	private void showHowTo()
+	private void loadFromMatch(){
+		//TODO: load
+	}
+	
+	private void doNewGame(){
+    	synchronized( this ){	    	
+    		List<Integer> vals = new LinkedList<Integer>();
+    		deck = new LinkedList<Integer>();
+	    	for( int val = 0; val <= (ROWS * COLUMNS / 2); val++ ){
+		    	for( int i = 0; i < 2; i++ ){
+		    		deck.add(val);
+		    		vals.add(val);
+		    	}
+	    	}
+	    	
+	    	// now fill the table from the list
+	    	int remaining = ROWS * COLUMNS;
+	    	for(int row = 0; row < ROWS; row++ ){    		
+	    		for( int column = 0; column < COLUMNS; column++ ){
+	    			int index = (int) (Math.random() * remaining);
+	    			int val = vals.remove(index);
+	    			remaining--;
+	    			
+	    			gameboard[row][column] = val;
+	    			owner_vals[row][column] = 0;
+	    			
+	    			FrameLayout view = (FrameLayout)findViewById(widget_ids[row][column]);
+	    			int owner = owner_vals[row][column];
+	    			IndexedButton button = new IndexedButton(this, row, column, val, owner);
+	    			
+	    			setUpButton(button);
+	            	
+	    			if( view.getChildCount() > 0 )
+	    				view.removeAllViews();
+	    			
+	            	view.addView(button);
+	            	widgets[row][column] = button;
+	    		}
+	    	}
+	    	
+	    	for( int i = 0; i < PLAYER_CARDS; i++ ){    			
+    			FrameLayout view = (FrameLayout)findViewById(player_card_ids[i]);
+    			
+    			int val = getNextPlayerOption( i, owner );
+    			IndexedButton child = new IndexedButton(this, -1, i, val, this.owner);
+            	setUpButton( child );
+    			if( view.getChildCount() > 0 )
+    				view.removeAllViews();
+    			
+            	view.addView(child);
+            	player_cards[i] = child;
+	    	}
+    	}
+    }
+
+	
+	private void addHowToText()
 	{
 	    String line1= "Get 5 tiles in a row vertically, horizontally, or diagonally to win.";
 	    
@@ -113,124 +161,16 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 	    desc.setText(line1 + "\n" + line2 + "\n" + line3);
 	}
 
-    private void setUpButton( Button button, int value, int owner ){
-    	button.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,TableRow.LayoutParams.MATCH_PARENT, 1.0f));
+    private void setUpButton( IndexedButton button ){
+//    	button.setLayoutParams(new FrameLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,TableRow.LayoutParams.MATCH_PARENT, 1.0f));
 		button.setBackgroundResource(R.drawable.custom_button);
 		button.setOnTouchListener(new TileTouchListener());
 		
 		button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
 		
-		switch( owner ){
-			case 1:
-				button.setBackgroundResource(R.drawable.player1);
-				break;
-			case 2:
-				button.setBackgroundResource(R.drawable.player2);
-				break;
-			default:
-				button.setBackgroundResource(R.drawable.custom_button);
-				break;
-		}
-		
-		button.setText(getEmoji(value));
-    }
+		button.updateBackground();
 
-    
-	private void doNewGame(){
-    	synchronized( this ){
-	    	LinkedList<Integer> list = new LinkedList<Integer>();
-	    	
-	    	for( int val = 0; val <= (ROWS * COLUMNS / 2); val++ ){
-		    	for( int i = 0; i < 2; i++ ){
-		    		list.add(val);
-		    	}
-	    	}
-	    	
-	    	// now fill the table from the list
-	    	int remaining = ROWS * COLUMNS;
-	    	for(int row = 0; row < ROWS; row++ ){    		
-	    		for( int column = 0; column < COLUMNS; column++ ){
-	    			int index = (int) (Math.random() * remaining);
-	    			int val = list.remove(index);
-	    			remaining--;
-	    			
-	    			gameboard[row][column] = val;
-	    			
-	    			FrameLayout view = (FrameLayout)findViewById(widget_ids[row][column]);
-	    			IndexedButton button = new IndexedButton(this, row, column, val);
-	    			
-	    			int owner = owner_vals[row][column];
-	    			setUpButton(button, val, owner);
-	            	
-	    			if( view.getChildCount() > 0 )
-	    				view.removeAllViews();
-	    			
-	            	view.addView(button);
-	            	widgets[row][column] = button;
-	    		}
-	    	}
-	    	
-	    	for( int i = 0; i < PLAYER_CARDS; i++ ){    			
-    			FrameLayout view = (FrameLayout)findViewById(player_card_ids[i]);
-    			
-    			int val = (int) (Math.random() * 38) - 2;
-    			IndexedButton child = new IndexedButton(this, -1, i, val);
-            	setUpButton( child, val, 1 );
-    			if( view.getChildCount() > 0 )
-    				view.removeAllViews();
-    			
-            	view.addView(child);
-            	player_cards[i] = child;
-	    	}
-    	}
-    }
-
-	@Override
-    public void onConnected(Bundle connectionHint) {
-//    	mSignInClicked = false;
-//	      
-//    	findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-//	    
-//	    final View signOutLayout = findViewById(R.id.sign_out_layout);
-//	    final TextView user_view = (TextView) findViewById(R.id.current_user);
-//	    
-//	    // show email for user signed in
-//	    String username = Plus.AccountApi.getAccountName(mGoogleApiClient);
-//	    if( username != null )
-//	    	user_view.setText(username);
-//	    
-//	    signOutLayout.setVisibility(View.VISIBLE);
-//	    findViewById(R.id.leaderboard_button).setVisibility(View.VISIBLE);
-    }
-    
-    public void onConnectionSuspended(int cause) {
-    	mGoogleApiClient.connect();
-    }
-    
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-//        if (mResolvingConnectionFailure) {
-//            // Already resolving
-//            return;
-//        }
-//
-//        // If the sign in button was clicked or if auto sign-in is enabled,
-//        // launch the sign-in flow
-//        if (mSignInClicked) {
-//            mSignInClicked = false;
-//            mResolvingConnectionFailure = true;
-//
-//            // Attempt to resolve the connection failure using BaseGameUtils.
-//            // The R.string.signin_other_error value should reference a generic
-//            // error string in your strings.xml file, such as "There was
-//            // an issue with sign in, please try again later."
-//            if (!BaseGameUtils.resolveConnectionFailure(this,
-//                    mGoogleApiClient, connectionResult,
-//                    RC_SIGN_IN, getString(R.string.sign_in_failed))) 
-//            {
-//                mResolvingConnectionFailure = false;
-//            }
-//        }
+		button.setText(getEmoji(button.getValue()));
     }
     
     protected LinkedList<IndexedButton> getEligibleDropTargets( int value ){
@@ -239,16 +179,223 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     	synchronized( Connections.this ){
     		for( int row = 0; row < ROWS; row++ ){
     			for( int col = 0; col < COLUMNS; col++ ){
-		    		if( gameboard[row][col] == value ){
-			    		// can't move a blank piece
-		    			eligible.add(widgets[row][col]);
+    				if( value < 0 ){
+    					//TODO: handle wild cards
+    				}
+    				else if( gameboard[row][col] == value ){
+			    		if( owner_vals[row][col] == 0 ){
+			    			eligible.add(widgets[row][col]);
+			    		}
 			    	}
     			}
     		}
     		return eligible;
     	}
     }
+	
+    private int getNextPlayerOption(int column, int owner){
+        int remaining = this.deck.size();
+        if( remaining == 0 ){
+            return -3;
+        }  
+        
+        int index = (int) (Math.random() * remaining);
+        int value = this.deck.remove(index);
+
+        if( owner == 2 ){
+            owner2_cards[column] = (int)value;
+        }
+        else{
+            owner1_cards[column] = (int)value;
+        }
+
+        return value;
+    }
     
+    private void highlightTileClicked( IndexedButton button ){
+    	this.owner_vals[button.getRow()][button.getColumn()] = this.owner;
+    	button.setOwner(this.owner);
+    	
+    	for( int i = 0; i < PLAYER_CARDS; i++ ){
+			IndexedButton ib = this.player_cards[i];
+			if( ib.isHighlighted() ){
+				int value = getNextPlayerOption( i, this.owner );
+				ib.setValue(value);
+				setUpButton(ib);
+			}
+    	}
+    	
+    	boolean winner = checkForWinner( this.owner, button.getRow(), button.getColumn() );
+    	
+    	if( winner ){
+    		new AlertDialog.Builder(this)
+	    	    .setTitle("You Won!")
+	    	    .setMessage("Would you like to start a rematch?")
+	    	    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	    	        public void onClick(DialogInterface dialog, int which) { 
+	    	            //TODO: continue with rematch
+	    	        }
+	    	     })
+	    	    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+	    	        public void onClick(DialogInterface dialog, int which) { 
+	    	            // do nothing
+	    	        }
+	    	     })
+	    	     .show();
+    	}
+    	
+    	//TODO: submit move
+    	if( this.owner == 1 ){
+    		this.owner = 2;
+    	}
+    	else{
+    		this.owner = 1;
+    	}
+	}
+    
+    private void removeAllHighlighting(){
+    	for( int i = 0; i < ROWS; i++ ){
+    		for( int j = 0; j < COLUMNS; j++ ){
+    			IndexedButton ib = this.widgets[i][j];
+    			ib.setHighlighted(false);
+    		}
+    	}
+    	
+    	for( int i = 0; i < PLAYER_CARDS; i++ ){
+			IndexedButton ib = this.player_cards[i];
+			ib.setHighlighted(false);
+    	}
+    }
+    
+    private boolean checkForWinner( int owner, int row, int column ){
+    	// check horizontal
+    	int connections = 0;
+    	for( int i = 0; i < COLUMNS; i++ ){
+    		if( this.owner_vals[row][i] == owner ){
+    			connections++;
+    		}
+    		else{
+    			connections = 0;
+    		}
+
+    		if( connections == 5 ){
+    			return true;
+    		}
+    	}
+
+    	// check vertical
+    	connections = 0;
+    	for( int i = 0; i < ROWS; i++ ){
+    		if( this.owner_vals[i][column] == owner ){
+    			connections++;
+    		}
+    		else{
+    			connections = 0;
+    		}
+
+    		if( connections == 5 ){
+    			return true;
+    		}
+    	}
+
+    	// check diagonal
+    	return this.checkDiagonal( owner, row, column );
+    }
+    
+    private boolean checkDiagonal( int owner, int row, int column ){
+    	return this.checkDiagonal1( owner, row, column ) || this.checkDiagonal2(owner, row, column);
+    }
+    
+    private boolean checkDiagonal1( int owner, int row, int column ){
+    	// top left to bottom right (row & column increase together)
+    	int connections = 0;
+    	if( column <= row ){
+    		for( int i = 0; i < COLUMNS; i++ ){
+    			if( (row - column) + i >= ROWS ){
+    				break;
+    			}
+    			if( this.owner_vals[(row - column) + i][i] == owner ){
+    				connections++;
+    			}
+    			else{
+    				connections = 0;
+    			}
+
+    			if( connections == 5 ){
+    				return true;
+    			}
+    		}
+    	}
+    	else{ //column > row
+    		for( int i = 0; i < ROWS; i++ ){
+    			if( (column - row) + i >= COLUMNS ){
+    				break;
+    			}
+    			if( this.owner_vals[i][(column - row) + i] == owner ){
+    				connections++;
+    			}
+    			else{
+    				connections = 0;
+    			}
+
+    			if( connections == 5 ){
+    				return true;
+    			}
+    		}
+    	}
+
+    	return false;
+    }
+    
+    private boolean checkDiagonal2( int owner, int row, int column ){
+    	// bottom left to top right (column increases while row decreases)
+    	int connections = 0;
+    	if( column < (ROWS - 1 - row) ){
+    		// we will start at column 0 and move until row 0
+    		int currCol = 0;
+    		int currRow = row + column;
+
+    		while( currRow >= 0 ){
+    			if( this.owner_vals[currRow][currCol] == owner ){
+    				connections++;
+    			}
+    			else{
+    				connections = 0;
+    			}
+
+    			if( connections == 5 ){
+    				return true;
+    			}
+
+    			currRow--;
+    			currCol++;
+    		}
+    	}
+    	else{ //column >= ([self getSections] - 1 - row)
+    		// we will start at last row and end at last column
+    		int currRow = ROWS - 1;
+    		int currCol = column - (ROWS - 1 - row);
+
+    		while( currCol < COLUMNS ){
+    			if( this.owner_vals[currRow][currCol] == owner ){
+    				connections++;
+    			}
+    			else{
+    				connections = 0;
+    			}
+
+    			if( connections == 5 ){
+    				return true;
+    			}
+
+    			currRow--;
+    			currCol++;
+    		}
+    	}
+
+    	return false;
+    }
+
     private final class TileTouchListener implements OnTouchListener 
     {
         @Override
@@ -257,10 +404,26 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
         		synchronized( Connections.this ){				        
 			        IndexedButton button = (IndexedButton)view;
 			        if( button.getRow() < 0 ){
-				        for( IndexedButton eligible:getEligibleDropTargets(button.getValue()) ){
-				        	if( eligible != null )
-				        		eligible.setHighlighted();
-				        }	
+			        	boolean wasHighlighted = button.isHighlighted();
+			        	// remove all highlighting
+			        	removeAllHighlighting();
+			        	
+			        	if( !wasHighlighted ){
+			        		button.setHighlighted(true);
+					        for( IndexedButton eligible:getEligibleDropTargets(button.getValue()) ){
+					        	if( eligible != null )
+					        		eligible.setHighlighted(true);
+					        }	
+			        	}
+			        }
+			        else{
+			        	if( button.isHighlighted() ){
+			        		// play the card on this spot
+			        		highlightTileClicked( button );
+			        		
+				        	// remove all highlighting
+				        	removeAllHighlighting();		        		
+			        	}
 			        }
         		}
         		
