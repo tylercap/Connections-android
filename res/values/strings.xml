@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Connections</string>
     <string name="action_settings">Settings</string>
     
@@ -9,7 +8,7 @@
     <string name="resign">Resign</string>
     <string name="submit">Submit</string>
 
-    <string name="banner_ad_id">ca-app-pub-8484316959485082/2150010457</string>    
+    <string name="banner_ad_id">ca-app-pub-8484316959485082/4533446853</string>    
     <string name="games_app_id">317322985582</string>        
     
     <string name="sign_in_failed">Failed to sign in. Please check your network connection and try again.</string>

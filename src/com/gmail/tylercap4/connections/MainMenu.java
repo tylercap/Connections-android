@@ -12,6 +12,7 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.OnInvitationReceivedListener;
@@ -20,6 +21,7 @@ import com.google.android.gms.games.multiplayer.turnbased.OnTurnBasedMatchUpdate
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer.LoadMatchesResult;
 import com.google.android.gms.plus.Plus;
 
 import android.app.Activity;
@@ -46,9 +48,9 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 	private static final String sign_in_row = "Sign in to access your games";
 	private static final String quick_match = "Quick Match";
 	private static final String choose_opponent = "Choose Opponent";
-	private static final String invited = "You've been invited!";
-	private static final String your_turn = "It's your turn!";
-	private static final String match_ended = "Match has ended!";
+//	private static final String invited = "You've been invited!";
+//	private static final String your_turn = "It's your turn!";
+//	private static final String match_ended = "Match has ended!";
 	
 	private MenuItem sign_in;
 	
@@ -59,11 +61,17 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 	private boolean mSignInClicked = false;
 	
 	private List<String> game_strings;
+	private List<TurnBasedMatch> matches;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_menu);
+	}
+	
+	@Override
+	protected void onResume(){
+		super.onResume();		
         
         mGoogleApiClient = new GoogleApiClient.Builder(this)
 		        .addConnectionCallbacks(this)
@@ -71,30 +79,34 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 		        .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .build();	
+    	
+    	reloadSignIn();
+    	
+		updateSignIn();
 	}
-	
-	@Override
-	protected void onResume(){
-		super.onResume();
-		
-		updateSignInButton();
-		
-		updateGameList();
-	}
-	
-	private void updateSignInButton(){
+	private void updateSignIn(){
 		if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+			updateSignIn( true );
+		}
+		else{
+			updateSignIn( false );
+		}
+	}
+	
+	private void updateSignIn( boolean signed_in ){
+		if( signed_in ){
 			if( this.sign_in != null )
 				this.sign_in.setTitle(R.string.sign_out);
 
-
 			// show email for user signed in
-			String username = Plus.AccountApi.getAccountName(mGoogleApiClient);
+//			String username = Plus.AccountApi.getAccountName(mGoogleApiClient);
 		}
 		else{
 			if( this.sign_in != null )
 				this.sign_in.setTitle(R.string.sign_in);
 		}
+		
+		updateGameList(this.mGoogleApiClient.isConnected());
 	}
 	
 	@Override
@@ -114,13 +126,6 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
     	prefs_editor.commit();
     }
     
-    @Override
-    protected void onStart(){
-    	super.onStart();
-    	
-    	reloadSignIn();
-    }
-    
     private void reloadSignIn(){
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	boolean signed_in = prefs.getBoolean(SIGNED_IN_KEY, false);
@@ -133,7 +138,9 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
     public void onConnected(Bundle connectionHint) {
     	mSignInClicked = false;
 	      
-    	updateSignInButton();
+    	Games.Invitations.registerInvitationListener(mGoogleApiClient, this);
+    	Games.TurnBasedMultiplayer.registerMatchUpdateListener(mGoogleApiClient, this);
+    	updateSignIn(true);
     }
     
     public void onConnectionSuspended(int cause) {
@@ -166,19 +173,89 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
         }
     }
 	
-	private void updateGameList(){
-		
-		ListView games_list = (ListView) findViewById(R.id.games_list);
-
+	private void updateGameList(boolean signed_in){		
 		game_strings = new LinkedList<String>();
-		if( this.mGoogleApiClient.isConnected() ){
+		if( signed_in && this.mGoogleApiClient.isConnected() ){
 			game_strings.add(quick_match);
 			game_strings.add(choose_opponent);
+			
+			//TODO: add open matches
+			matches = new LinkedList<TurnBasedMatch>();
+			int[] statuses = new int[] { TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN, TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN, TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE };
+			Games.TurnBasedMultiplayer.loadMatchesByStatus( mGoogleApiClient, statuses )
+				.setResultCallback( new ResultCallback<LoadMatchesResult>()
+				{
+					@Override
+					public void onResult( LoadMatchesResult result )
+					{
+						if( result.getStatus().getStatusCode() != GamesStatusCodes.STATUS_OK )
+						{
+							System.out.println(result.getStatus().getStatusMessage());
+						}
+						else
+						{							
+							for( int i = 0; i < result.getMatches().getCompletedMatches().getCount(); i++ ){
+								TurnBasedMatch match = result.getMatches().getCompletedMatches().get( i ); 
+								matches.add( match );
+								String opponent = Model.getOpponentFromMatch(match).getDisplayName();
+								game_strings.add(opponent);
+							}
+							
+//							for( int i = 0; i < result.getMatches().getInvitations().getCount(); i++ ){
+//								result.getMatches().getInvitations().get( i );
+//							}
+								
+							for( int i = 0; i < result.getMatches().getMyTurnMatches().getCount(); i++ ){
+								TurnBasedMatch match = result.getMatches().getMyTurnMatches().get( i ); 
+								matches.add( match );
+								String opponent = Model.getOpponentFromMatch(match).getDisplayName();
+								game_strings.add(opponent + ": Your Turn");
+							}
+								
+							for( int i = 0; i < result.getMatches().getTheirTurnMatches().getCount(); i++ ){
+								TurnBasedMatch match = result.getMatches().getTheirTurnMatches().get( i );								 
+								matches.add( match );
+								String opponent = Model.getOpponentFromMatch(match).getDisplayName();
+								game_strings.add(opponent + ": Their Turn");
+							}
+							
+							reloadDisplay();
+						}
+					}
+				});
+
 		}
 		else{
 			game_strings.add(sign_in_row);
 		}
-		
+		reloadDisplay();	
+	}	
+	
+//	            case GPGTurnBasedUserMatchStatusMatchCompleted: //Completed match
+//	                for (GPGTurnBasedParticipantResult *result in match.results)
+//	                {
+//	                    if( [result.participantId isEqualToString:[model getOpponent].participantId] ){
+//	                        // opponent result
+//	                        if( result.result == GPGTurnBasedParticipantResultStatusWin ){
+//	                            resultStr = @"You Lost";
+//	                        }
+//	                        if( result.result == GPGTurnBasedParticipantResultStatusLoss ){
+//	                            resultStr = @"You Won!";
+//	                        }
+//	                    }
+//	                    else{
+//	                        // my result
+//	                        if( result.result == GPGTurnBasedParticipantResultStatusWin ){
+//	                            resultStr = @"You Won!";
+//	                        }
+//	                        if( result.result == GPGTurnBasedParticipantResultStatusLoss ){
+//	                            resultStr = @"You Lost";
+//	                        }
+//	                    }
+//	                }		
+
+	private void reloadDisplay(){
+		ListView games_list = (ListView) findViewById(R.id.games_list);
         // Set the adapter for the list view
         games_list.setAdapter (new ArrayAdapter<String>(this, R.layout.game_list_item,
                 R.id.game_label, game_strings) );
@@ -227,59 +304,36 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 				return;
 			case quick_match:
 				startQuickMatch();
-				break;
+				return;
 			case choose_opponent:
 				chooseOpponent();
-				break;
-		}		
+				return;
+		}
+
+		// open existing match
+		TurnBasedMatch match = matches.get(position - 2);
+		openMatch(match);		
+	}
+	
+	private Model submitNewMatch(TurnBasedMatch match){
+		// submit the match to gpg with initial data
+		String myId = Games.Players.getCurrentPlayer(mGoogleApiClient).getPlayerId();
+		Model model = new Model(match, myId);
+		byte[] data = model.storeToData();
+		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(), data, myId);
 		
-//		NSString *opponentName = [model getOpponentDisplayName];
-//        
-//        NSString *resultStr = @"Match Expired";
-//        switch (match.userMatchStatus)
-//        {
-//            case GPGTurnBasedUserMatchStatusTurn:         //My turn
-//                cell.title.text = [NSString stringWithFormat:@"%@: Your Turn", opponentName];
-//                break;
-//            case GPGTurnBasedUserMatchStatusAwaitingTurn: //Their turn
-//                cell.title.text = [NSString stringWithFormat:@"%@: Their Turn", opponentName];
-//                break;
-//            case GPGTurnBasedUserMatchStatusInvited:
-//                cell.title.text = [NSString stringWithFormat:@"%@: You're Invited", opponentName];
-//                break;
-//            case GPGTurnBasedUserMatchStatusMatchCompleted: //Completed match
-//                for (GPGTurnBasedParticipantResult *result in match.results)
-//                {
-//                    if( [result.participantId isEqualToString:[model getOpponent].participantId] ){
-//                        // opponent result
-//                        if( result.result == GPGTurnBasedParticipantResultStatusWin ){
-//                            resultStr = @"You Lost";
-//                        }
-//                        if( result.result == GPGTurnBasedParticipantResultStatusLoss ){
-//                            resultStr = @"You Won!";
-//                        }
-//                    }
-//                    else{
-//                        // my result
-//                        if( result.result == GPGTurnBasedParticipantResultStatusWin ){
-//                            resultStr = @"You Won!";
-//                        }
-//                        if( result.result == GPGTurnBasedParticipantResultStatusLoss ){
-//                            resultStr = @"You Lost";
-//                        }
-//                    }
-//                }
-//                
-//                cell.title.text = [NSString stringWithFormat:@"%@: %@", opponentName, resultStr];
-//                break;
-//            default:
-//                cell.title.text = opponentName;
-//                break;
-//        }
+		return model;
 	}
 	
 	private void openMatch(TurnBasedMatch match){
+		String myId = Games.Players.getCurrentPlayer(mGoogleApiClient).getPlayerId();
+		Model model = new Model(match, myId);
+		openMatch(match.getMatchId(), model);
+	}
+	
+	private void openMatch(String id, Model model){
 		Intent i = new Intent( this, Connections.class );
+		i.putExtra(Model.ID_TAG, id);
 		startActivity(i);
 	}
 	
@@ -329,12 +383,10 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
             }
 
             // Get the invitee list.
-            final ArrayList<String> invitees =
-                    data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
+            final ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
 
             // Get auto-match criteria.
-            int minAutoMatchPlayers = data.getIntExtra(
-                    Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0);
+            int minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0);
             if (minAutoMatchPlayers > 0) {
             	startQuickMatch();
             }
@@ -420,7 +472,8 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
                     Games.signOut(mGoogleApiClient);
                     mGoogleApiClient.clearDefaultAccountAndReconnect();
                     
-                    item.setTitle(R.string.sign_in);
+                    updateSignIn(false);
+                    updateGameList(false);
 			}
 			else if (!mGoogleApiClient.isConnecting()) {
             		mSignInClicked = true;
@@ -445,8 +498,7 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 		
 		    TurnBasedMatch match = result.getMatch();
 		
-		    // If this player is not the first player in this match, continue.
-		    openMatch(match);
+		    openMatch(match.getMatchId(), submitNewMatch(match));
 		}
 	}
 }

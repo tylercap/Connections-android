@@ -1,16 +1,17 @@
 package com.gmail.tylercap4.connections;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
-import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.games.Games;
+import com.google.android.gms.plus.Plus;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -21,28 +22,19 @@ import android.widget.TextView;
 
 public class Connections extends Activity
 {		
-	public static final int ROWS = 9;
-	public static final int COLUMNS = 8;
-	public static final int PLAYER_CARDS = 6;
-
     private AdView adMobView;
     
-	private TurnBasedMultiplayer multiplayer;
-	private TurnBasedMatch match;
-	private int owner = 1;
+	/* Client used to interact with Google APIs. */
+	protected GoogleApiClient mGoogleApiClient;
+    
+	private Model model;
+	private int owner = 2; //TODO: change
 	
 	private int [][] widget_ids;
 	private int [] player_card_ids;
 	
 	private IndexedButton [][] 	widgets;
 	private IndexedButton [] 	player_cards;
-	
-	private int [][] 			gameboard;
-	private int [][] 			owner_vals;
-	
-	private LinkedList<Integer> deck;
-	private int[]				owner1_cards;
-	private int[]				owner2_cards;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,94 +50,35 @@ public class Connections extends Activity
     protected void onPause(){
     	super.onPause();
         adMobView.pause();
+        //TODO: store the id to our shared preferences
     }
 	
 	@Override
 	protected void onResume(){
 		super.onResume();
         adMobView.resume();
+//        mGoogleApiClient = new GoogleApiClient.Builder(this)
+//        .addConnectionCallbacks(this)
+//        .addOnConnectionFailedListener(this)
+//        .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
+//        .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+//        .build();	
+//        mGoogleApiClient.connect();
+        
+		addHowToText();
 
-		if( gameboard == null ){
-			widget_ids = new int[ROWS][COLUMNS];
-			player_card_ids = new int[PLAYER_CARDS];
+		if( widgets == null ){
+			widget_ids = new int[Model.ROWS][Model.COLUMNS];
+			player_card_ids = new int[Model.PLAYER_CARDS];
 			
-			gameboard = new int[ROWS][COLUMNS];
-			owner_vals = new int[ROWS][COLUMNS];
-			
-			widgets = new IndexedButton[ROWS][COLUMNS];
-			player_cards = new IndexedButton[PLAYER_CARDS];
-			
-			owner1_cards = new int[PLAYER_CARDS];
-			owner2_cards = new int[PLAYER_CARDS];
+			widgets = new IndexedButton[Model.ROWS][Model.COLUMNS];
+			player_cards = new IndexedButton[Model.PLAYER_CARDS];
 			
 			initWidgetIds();
 		}
 		
-		if( match == null || match.getData() == null ){
-			doNewGame();
-		}
-		else{
-			loadFromMatch();
-		}
-		
-		addHowToText();
+		loadModel();
 	}
-	
-	private void loadFromMatch(){
-		//TODO: load
-	}
-	
-	private void doNewGame(){
-    	synchronized( this ){	    	
-    		List<Integer> vals = new LinkedList<Integer>();
-    		deck = new LinkedList<Integer>();
-	    	for( int val = 0; val <= (ROWS * COLUMNS / 2); val++ ){
-		    	for( int i = 0; i < 2; i++ ){
-		    		deck.add(val);
-		    		vals.add(val);
-		    	}
-	    	}
-	    	
-	    	// now fill the table from the list
-	    	int remaining = ROWS * COLUMNS;
-	    	for(int row = 0; row < ROWS; row++ ){    		
-	    		for( int column = 0; column < COLUMNS; column++ ){
-	    			int index = (int) (Math.random() * remaining);
-	    			int val = vals.remove(index);
-	    			remaining--;
-	    			
-	    			gameboard[row][column] = val;
-	    			owner_vals[row][column] = 0;
-	    			
-	    			FrameLayout view = (FrameLayout)findViewById(widget_ids[row][column]);
-	    			int owner = owner_vals[row][column];
-	    			IndexedButton button = new IndexedButton(this, row, column, val, owner);
-	    			
-	    			setUpButton(button);
-	            	
-	    			if( view.getChildCount() > 0 )
-	    				view.removeAllViews();
-	    			
-	            	view.addView(button);
-	            	widgets[row][column] = button;
-	    		}
-	    	}
-	    	
-	    	for( int i = 0; i < PLAYER_CARDS; i++ ){    			
-    			FrameLayout view = (FrameLayout)findViewById(player_card_ids[i]);
-    			
-    			int val = getNextPlayerOption( i, owner );
-    			IndexedButton child = new IndexedButton(this, -1, i, val, this.owner);
-            	setUpButton( child );
-    			if( view.getChildCount() > 0 )
-    				view.removeAllViews();
-    			
-            	view.addView(child);
-            	player_cards[i] = child;
-	    	}
-    	}
-    }
-
 	
 	private void addHowToText()
 	{
@@ -159,6 +92,60 @@ public class Connections extends Activity
 	    
 	    TextView desc = (TextView)findViewById(R.id.description);
 	    desc.setText(line1 + "\n" + line2 + "\n" + line3);
+	}
+	
+	private void assignModelFromId( String id ){
+		this.model = Model.ID_TO_MODEL_MAP.get(id);
+	}
+	
+	private void loadModel(){
+		if( this.model == null ){
+			Intent i = getIntent();
+			if( i != null ){
+				String id = i.getStringExtra(Model.ID_TAG);
+				if( id != null ){
+					assignModelFromId(id);
+				}
+			}
+		}
+		// model could still be null
+		if( this.model == null ){
+			//TODO: load the id from our shared preferences
+		}
+		
+		for(int row = 0; row < Model.ROWS; row++ ){    		
+    		for( int column = 0; column < Model.COLUMNS; column++ ){
+    			FrameLayout view = (FrameLayout)findViewById(widget_ids[row][column]);
+    			
+    			int card_owner = model.getOwnerAt(row, column);
+    			int val = model.getValueAt(row, column);
+    			
+    			IndexedButton button = new IndexedButton(this, row, column, val, card_owner);
+    			
+    			setUpButton(button);
+            	
+    			if( view.getChildCount() > 0 )
+    				view.removeAllViews();
+    			
+            	view.addView(button);
+            	widgets[row][column] = button;
+    		}
+    	}
+    	
+    	for( int i = 0; i < Model.PLAYER_CARDS; i++ ){    			
+			FrameLayout view = (FrameLayout)findViewById(player_card_ids[i]);
+			
+			int val = model.getPlayerCardAt( this.owner, i );
+			System.out.println(val);
+			
+			IndexedButton child = new IndexedButton(this, -1, i, val, this.owner);
+        	setUpButton( child );
+			if( view.getChildCount() > 0 )
+				view.removeAllViews();
+			
+        	view.addView(child);
+        	player_cards[i] = child;
+    	}
 	}
 
     private void setUpButton( IndexedButton button ){
@@ -177,13 +164,13 @@ public class Connections extends Activity
     	LinkedList<IndexedButton> eligible = new LinkedList<IndexedButton>();
     	
     	synchronized( Connections.this ){
-    		for( int row = 0; row < ROWS; row++ ){
-    			for( int col = 0; col < COLUMNS; col++ ){
+    		for( int row = 0; row < Model.ROWS; row++ ){
+    			for( int col = 0; col < Model.COLUMNS; col++ ){
     				if( value < 0 ){
     					//TODO: handle wild cards
     				}
-    				else if( gameboard[row][col] == value ){
-			    		if( owner_vals[row][col] == 0 ){
+    				else if( model.getValueAt(row, col) == value ){
+			    		if( model.getOwnerAt(row, col) == 0 ){
 			    			eligible.add(widgets[row][col]);
 			    		}
 			    	}
@@ -192,40 +179,21 @@ public class Connections extends Activity
     		return eligible;
     	}
     }
-	
-    private int getNextPlayerOption(int column, int owner){
-        int remaining = this.deck.size();
-        if( remaining == 0 ){
-            return -3;
-        }  
-        
-        int index = (int) (Math.random() * remaining);
-        int value = this.deck.remove(index);
-
-        if( owner == 2 ){
-            owner2_cards[column] = (int)value;
-        }
-        else{
-            owner1_cards[column] = (int)value;
-        }
-
-        return value;
-    }
     
     private void highlightTileClicked( IndexedButton button ){
-    	this.owner_vals[button.getRow()][button.getColumn()] = this.owner;
+    	model.setOwnerAt( this.owner, button.getRow(), button.getColumn() );
     	button.setOwner(this.owner);
     	
-    	for( int i = 0; i < PLAYER_CARDS; i++ ){
+    	for( int i = 0; i < Model.PLAYER_CARDS; i++ ){
 			IndexedButton ib = this.player_cards[i];
 			if( ib.isHighlighted() ){
-				int value = getNextPlayerOption( i, this.owner );
+				int value = model.getNextPlayerOption( i, this.owner );
 				ib.setValue(value);
 				setUpButton(ib);
 			}
     	}
     	
-    	boolean winner = checkForWinner( this.owner, button.getRow(), button.getColumn() );
+    	boolean winner = model.checkForWinner( this.owner, button.getRow(), button.getColumn() );
     	
     	if( winner ){
     		new AlertDialog.Builder(this)
@@ -245,6 +213,9 @@ public class Connections extends Activity
     	}
     	
     	//TODO: submit move
+//		String myId = Games.Players.getCurrentPlayer(mGoogleApiClient).getPlayerId();
+//		byte[] data = model.storeToData();
+//		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(), data, myId);
     	if( this.owner == 1 ){
     		this.owner = 2;
     	}
@@ -254,146 +225,17 @@ public class Connections extends Activity
 	}
     
     private void removeAllHighlighting(){
-    	for( int i = 0; i < ROWS; i++ ){
-    		for( int j = 0; j < COLUMNS; j++ ){
+    	for( int i = 0; i < Model.ROWS; i++ ){
+    		for( int j = 0; j < Model.COLUMNS; j++ ){
     			IndexedButton ib = this.widgets[i][j];
     			ib.setHighlighted(false);
     		}
     	}
     	
-    	for( int i = 0; i < PLAYER_CARDS; i++ ){
+    	for( int i = 0; i < Model.PLAYER_CARDS; i++ ){
 			IndexedButton ib = this.player_cards[i];
 			ib.setHighlighted(false);
     	}
-    }
-    
-    private boolean checkForWinner( int owner, int row, int column ){
-    	// check horizontal
-    	int connections = 0;
-    	for( int i = 0; i < COLUMNS; i++ ){
-    		if( this.owner_vals[row][i] == owner ){
-    			connections++;
-    		}
-    		else{
-    			connections = 0;
-    		}
-
-    		if( connections == 5 ){
-    			return true;
-    		}
-    	}
-
-    	// check vertical
-    	connections = 0;
-    	for( int i = 0; i < ROWS; i++ ){
-    		if( this.owner_vals[i][column] == owner ){
-    			connections++;
-    		}
-    		else{
-    			connections = 0;
-    		}
-
-    		if( connections == 5 ){
-    			return true;
-    		}
-    	}
-
-    	// check diagonal
-    	return this.checkDiagonal( owner, row, column );
-    }
-    
-    private boolean checkDiagonal( int owner, int row, int column ){
-    	return this.checkDiagonal1( owner, row, column ) || this.checkDiagonal2(owner, row, column);
-    }
-    
-    private boolean checkDiagonal1( int owner, int row, int column ){
-    	// top left to bottom right (row & column increase together)
-    	int connections = 0;
-    	if( column <= row ){
-    		for( int i = 0; i < COLUMNS; i++ ){
-    			if( (row - column) + i >= ROWS ){
-    				break;
-    			}
-    			if( this.owner_vals[(row - column) + i][i] == owner ){
-    				connections++;
-    			}
-    			else{
-    				connections = 0;
-    			}
-
-    			if( connections == 5 ){
-    				return true;
-    			}
-    		}
-    	}
-    	else{ //column > row
-    		for( int i = 0; i < ROWS; i++ ){
-    			if( (column - row) + i >= COLUMNS ){
-    				break;
-    			}
-    			if( this.owner_vals[i][(column - row) + i] == owner ){
-    				connections++;
-    			}
-    			else{
-    				connections = 0;
-    			}
-
-    			if( connections == 5 ){
-    				return true;
-    			}
-    		}
-    	}
-
-    	return false;
-    }
-    
-    private boolean checkDiagonal2( int owner, int row, int column ){
-    	// bottom left to top right (column increases while row decreases)
-    	int connections = 0;
-    	if( column < (ROWS - 1 - row) ){
-    		// we will start at column 0 and move until row 0
-    		int currCol = 0;
-    		int currRow = row + column;
-
-    		while( currRow >= 0 ){
-    			if( this.owner_vals[currRow][currCol] == owner ){
-    				connections++;
-    			}
-    			else{
-    				connections = 0;
-    			}
-
-    			if( connections == 5 ){
-    				return true;
-    			}
-
-    			currRow--;
-    			currCol++;
-    		}
-    	}
-    	else{ //column >= ([self getSections] - 1 - row)
-    		// we will start at last row and end at last column
-    		int currRow = ROWS - 1;
-    		int currCol = column - (ROWS - 1 - row);
-
-    		while( currCol < COLUMNS ){
-    			if( this.owner_vals[currRow][currCol] == owner ){
-    				connections++;
-    			}
-    			else{
-    				connections = 0;
-    			}
-
-    			if( connections == 5 ){
-    				return true;
-    			}
-
-    			currRow--;
-    			currCol++;
-    		}
-    	}
-
-    	return false;
     }
 
     private final class TileTouchListener implements OnTouchListener 
