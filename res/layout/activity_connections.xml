@@ -172,9 +172,9 @@
         	<FrameLayout android:layout_weight="1" android:id="@+id/playerCard4"/>
         	<FrameLayout android:layout_weight="1" android:id="@+id/playerCard5"/>
 	        <Button
-		        android:id="@+id/sorButton"
+		        android:id="@+id/resignButton"
 		        android:text="@string/resign"
-	    		style="@style/SubmitOrResignButton" />
+	    		style="@style/ResignButton" />
     </TableRow>
 
 </LinearLayout>

@@ -4,31 +4,46 @@ import java.util.LinkedList;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.multiplayer.Participant;
+import com.google.android.gms.games.multiplayer.ParticipantResult;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer.InitiateMatchResult;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer.UpdateMatchResult;
 import com.google.android.gms.plus.Plus;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class Connections extends Activity
+public class Connections extends Activity implements ConnectionCallbacks, OnConnectionFailedListener
 {		
+    private static final String PREFS_NAME = "MyPrefsFile";
+    private static final String MATCH_ID_TAG = "MatchID";
+    
     private AdView adMobView;
     
 	/* Client used to interact with Google APIs. */
 	protected GoogleApiClient mGoogleApiClient;
     
 	private Model model;
-	private int owner = 2; //TODO: change
+	private boolean my_turn;
+	private int owner;
 	
 	private int [][] widget_ids;
 	private int [] player_card_ids;
@@ -50,20 +65,30 @@ public class Connections extends Activity
     protected void onPause(){
     	super.onPause();
         adMobView.pause();
-        //TODO: store the id to our shared preferences
+        
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        try{
+	        editor.putString(MATCH_ID_TAG, this.model.getMatchId());
+	        editor.commit();
+        }
+        catch(Exception ex){
+        	
+        }
     }
 	
 	@Override
 	protected void onResume(){
 		super.onResume();
         adMobView.resume();
-//        mGoogleApiClient = new GoogleApiClient.Builder(this)
-//        .addConnectionCallbacks(this)
-//        .addOnConnectionFailedListener(this)
-//        .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
-//        .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-//        .build();	
-//        mGoogleApiClient.connect();
+        
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        .addConnectionCallbacks(this)
+        .addOnConnectionFailedListener(this)
+        .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
+        .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+        .build();	
+        mGoogleApiClient.connect();
         
 		addHowToText();
 
@@ -78,7 +103,47 @@ public class Connections extends Activity
 		}
 		
 		loadModel();
+
+    	setUpResignButton();
 	}
+	
+	private void setUpResignButton(){
+		Button resign_button = (Button)findViewById(R.id.resignButton);
+    	if( resign_button != null ){
+    		// add resign action
+    		resign_button.setEnabled(this.my_turn);
+    		
+    		if(this.my_turn){
+    			resign_button.setBackgroundResource(R.drawable.resign_button);
+    		}
+    		else{
+    			resign_button.setBackgroundResource(R.drawable.resign_disabled);
+    		}
+    		
+    		resign_button.setOnClickListener(new OnClickListener(){
+    			
+				@Override
+			    public void onClick(View view) {
+					doResign();
+				}
+			});				
+    	}
+	}
+	
+	@Override
+    public void onConnected(Bundle connectionHint) {
+		// Don't need to do anything
+    }
+    
+    public void onConnectionSuspended(int cause) {
+    	mGoogleApiClient.connect();
+    }
+    
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+//        super.onBackPressed();
+    	this.finish();
+    }
 	
 	private void addHowToText()
 	{
@@ -109,9 +174,26 @@ public class Connections extends Activity
 			}
 		}
 		// model could still be null
-		if( this.model == null ){
-			//TODO: load the id from our shared preferences
+		if( this.model == null ){			
+			SharedPreferences settings = this.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+			String id = settings.getString(MATCH_ID_TAG, "");
+			if( id != null && !id.isEmpty() ){
+				assignModelFromId(id);
+			}
 		}
+		
+		if( this.model == null ){
+			finish();
+			return;
+		}
+		
+		// set which owner we are
+		this.owner = this.model.getOwnerForMe(this);
+		if( this.owner < 1 || this.owner > 2 ){
+			this.finish();
+		}
+		// enable/disable activity based on myTurn
+		this.my_turn = this.model.isMyTurn();
 		
 		for(int row = 0; row < Model.ROWS; row++ ){    		
     		for( int column = 0; column < Model.COLUMNS; column++ ){
@@ -136,8 +218,7 @@ public class Connections extends Activity
 			FrameLayout view = (FrameLayout)findViewById(player_card_ids[i]);
 			
 			int val = model.getPlayerCardAt( this.owner, i );
-			System.out.println(val);
-			
+		
 			IndexedButton child = new IndexedButton(this, -1, i, val, this.owner);
         	setUpButton( child );
 			if( view.getChildCount() > 0 )
@@ -151,7 +232,7 @@ public class Connections extends Activity
     private void setUpButton( IndexedButton button ){
 //    	button.setLayoutParams(new FrameLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,TableRow.LayoutParams.MATCH_PARENT, 1.0f));
 		button.setBackgroundResource(R.drawable.custom_button);
-		button.setOnTouchListener(new TileTouchListener());
+		button.setOnClickListener(new TileClickListener());
 		
 		button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
 		
@@ -167,7 +248,19 @@ public class Connections extends Activity
     		for( int row = 0; row < Model.ROWS; row++ ){
     			for( int col = 0; col < Model.COLUMNS; col++ ){
     				if( value < 0 ){
-    					//TODO: handle wild cards
+    					int tileOwner = model.getOwnerAt(row, col);
+    					if( value == -2 ){
+    						// can remove any of the opponents cards
+    						if( tileOwner != 0 && tileOwner != this.owner ){
+    			    			eligible.add(widgets[row][col]);
+    			    		}
+    					}
+    					else{
+    						// can play on any space
+    						if( tileOwner == 0 ){
+    			    			eligible.add(widgets[row][col]);
+    			    		}
+    					}
     				}
     				else if( model.getValueAt(row, col) == value ){
 			    		if( model.getOwnerAt(row, col) == 0 ){
@@ -181,8 +274,15 @@ public class Connections extends Activity
     }
     
     private void highlightTileClicked( IndexedButton button ){
-    	model.setOwnerAt( this.owner, button.getRow(), button.getColumn() );
-    	button.setOwner(this.owner);
+    	if( button.getValue() == -2 ){
+			// remove card
+    		model.setOwnerAt( 0, button.getRow(), button.getColumn() );
+	    	button.setOwner(0);
+		}
+    	else{
+	    	model.setOwnerAt( this.owner, button.getRow(), button.getColumn() );
+	    	button.setOwner(this.owner);
+    	}
     	
     	for( int i = 0; i < Model.PLAYER_CARDS; i++ ){
 			IndexedButton ib = this.player_cards[i];
@@ -196,33 +296,171 @@ public class Connections extends Activity
     	boolean winner = model.checkForWinner( this.owner, button.getRow(), button.getColumn() );
     	
     	if( winner ){
-    		new AlertDialog.Builder(this)
-	    	    .setTitle("You Won!")
-	    	    .setMessage("Would you like to challenge your opponent to a rematch?")
-	    	    .setPositiveButton("Rematch", new DialogInterface.OnClickListener() {
-	    	        public void onClick(DialogInterface dialog, int which) { 
-	    	            //TODO: continue with rematch
-	    	        }
-	    	     })
-	    	    .setNegativeButton("Close", new DialogInterface.OnClickListener() {
-	    	        public void onClick(DialogInterface dialog, int which) { 
-	    	            // do nothing
-	    	        }
-	    	     })
-	    	     .show();
-    	}
-    	
-    	//TODO: submit move
-//		String myId = Games.Players.getCurrentPlayer(mGoogleApiClient).getPlayerId();
-//		byte[] data = model.storeToData();
-//		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(), data, myId);
-    	if( this.owner == 1 ){
-    		this.owner = 2;
+    		// submit winner
+    		byte[] data = model.storeToData();
+    		Participant opponent = model.getOpponent();
+    		
+    		LinkedList<ParticipantResult> results = new LinkedList<ParticipantResult>();
+    		ParticipantResult myResult = new ParticipantResult(model.getMyPartId(), ParticipantResult.MATCH_RESULT_WIN, 1);
+    		results.add(myResult);
+    		
+    		ParticipantResult oppResult = new ParticipantResult(opponent.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS, 2);
+    		results.add(oppResult);
+    		
+    		try{
+    			this.my_turn = false;
+	    		Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, model.getMatchId(), data, results)
+	    								  .setResultCallback(new ResultCallback<UpdateMatchResult>(){
+	    									  @Override
+	    									  public void onResult(UpdateMatchResult updateMatchResult) {
+	    										  if( !updateMatchResult.getStatus().isSuccess() ){
+	    											  String message = updateMatchResult.getStatus().getStatusMessage();
+	    											  System.out.println(message);
+	    											  Toast.makeText(Connections.this, "Check you internet connection, or try again later.", Toast.LENGTH_LONG).show();
+	    									    	        	
+	    									    	  // back to menu
+	    									    	  Connections.this.finish();
+	    										  }
+	    										  else{
+	    											  new AlertDialog.Builder(Connections.this)
+	    									    	    .setTitle("You Won!")
+	    									    	    .setMessage("Would you like to challenge your opponent to a rematch?")
+	    									    	    .setPositiveButton("Rematch", new DialogInterface.OnClickListener() {
+	    									    	        public void onClick(DialogInterface dialog, int which) { 
+	    									    	            doRematch();
+	    									    	        }
+	    									    	     })
+	    									    	    .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+	    									    	        public void onClick(DialogInterface dialog, int which) { 
+	    									    	            // do nothing
+	    									    	        }
+	    									    	     })
+	    									    	     .show();
+	    										  }
+	    									  }
+	    								  });
+	    		
+    		}
+    		catch(Exception ex){
+    			Model.showConnectionError(this, "Unable to Submit Move");
+    			this.finish();
+    		}
     	}
     	else{
-    		this.owner = 1;
+        	// submit move
+    		this.my_turn = false;
+    		model.flipTurn();
+    		byte[] data = model.storeToData();
+    		Participant opponent = model.getOpponent();
+    		try{
+	    		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, model.getMatchId(), data, opponent.getParticipantId())
+	    								  .setResultCallback(new ResultCallback<UpdateMatchResult>(){
+	    									  @Override
+	    									  public void onResult(UpdateMatchResult updateMatchResult) {
+	    										  if( !updateMatchResult.getStatus().isSuccess() ){
+	    											  String message = updateMatchResult.getStatus().getStatusMessage();
+	    											  System.out.println(message);
+	    											  
+	    											  Toast.makeText(Connections.this, "Check you internet connection, or try again later.", Toast.LENGTH_LONG).show();
+	    									    	  model.flipTurn();
+	    									    	        	
+	    									    	  // back to menu
+	    									    	  Connections.this.finish();
+	    										  }
+	    									  }
+	    								  });
+    		}
+    		catch(IllegalStateException ex){
+    			Model.showConnectionError(this, "Unable to Submit Move");
+    			this.finish();
+    		}
     	}
 	}
+    
+    private void doRematch(){
+    	// continue with rematch
+    	try{
+	    	Games.TurnBasedMultiplayer.rematch(mGoogleApiClient, this.model.getMatchId())
+	    							  .setResultCallback(new ResultCallback<InitiateMatchResult>(){
+				  @Override
+				  public void onResult(InitiateMatchResult initiateMatchResult) {
+					  if( !initiateMatchResult.getStatus().isSuccess() ){
+						  Toast.makeText(Connections.this, "Check you internet connection, or try again later.", Toast.LENGTH_LONG).show();
+				    	        	
+				    	  // back to menu
+				    	  Connections.this.finish();
+					  }
+					  else{
+						  TurnBasedMatch match = initiateMatchResult.getMatch();
+						  Model model = Model.submitNewMatch(match, mGoogleApiClient, Connections.this);
+							
+						  if( model != null ){
+							  Intent i = new Intent( Connections.this, Connections.class );
+							  i.putExtra(Model.ID_TAG, match.getMatchId());
+							  Connections.this.startActivity(i);
+						  }
+					  }
+				  }
+			  });
+    	}
+    	catch(IllegalStateException ex){
+    		Model.showConnectionError(this, "Unable to Start a Rematch");
+    		this.finish();
+    	}
+    }
+
+    private void doResign(){
+    	byte[] data = model.storeToData();
+		Participant opponent = model.getOpponent();
+		
+		LinkedList<ParticipantResult> results = new LinkedList<ParticipantResult>();
+		ParticipantResult myResult = new ParticipantResult(model.getMyPartId(), ParticipantResult.MATCH_RESULT_LOSS, 2);
+		results.add(myResult);
+		
+		ParticipantResult oppResult = new ParticipantResult(opponent.getParticipantId(), ParticipantResult.MATCH_RESULT_WIN, 1);
+		results.add(oppResult);
+		
+		this.my_turn = false;
+		try{
+			Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, model.getMatchId(), data, results)
+									  .setResultCallback(new ResultCallback<UpdateMatchResult>(){
+										  @Override
+										  public void onResult(UpdateMatchResult updateMatchResult) {
+											  if( !updateMatchResult.getStatus().isSuccess() ){
+												  String message = updateMatchResult.getStatus().getStatusMessage();
+    											  System.out.println(message);
+    											  
+    											  Toast.makeText(Connections.this, "Check you internet connection, or try again later.", Toast.LENGTH_LONG).show();
+
+    											  Connections.this.finish();
+											  }
+											  else{
+													new AlertDialog.Builder(Connections.this)
+											    	    .setTitle("You Resigned")
+											    	    .setMessage("Would you like to challenge your opponent to a rematch?")
+											    	    .setPositiveButton("Rematch", new DialogInterface.OnClickListener() {
+											    	        public void onClick(DialogInterface dialog, int which) { 
+											    	            doRematch();
+											    	        }
+											    	     })
+											    	    .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+											    	        public void onClick(DialogInterface dialog, int which) { 
+											    	            // do nothing
+											    	        }
+											    	     })
+											    	     .show();
+											  }
+										  }
+									  });
+		}
+		catch(IllegalStateException ex){
+			Model.showConnectionError(this, "Unable to Resign");
+			this.finish();
+		}
+
+    	this.my_turn = false;
+    	setUpResignButton();
+    }
     
     private void removeAllHighlighting(){
     	for( int i = 0; i < Model.ROWS; i++ ){
@@ -238,12 +476,12 @@ public class Connections extends Activity
     	}
     }
 
-    private final class TileTouchListener implements OnTouchListener 
+    private final class TileClickListener implements OnClickListener 
     {
         @Override
-	    public boolean onTouch(View view, MotionEvent motionEvent) {
-        	if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-        		synchronized( Connections.this ){				        
+	    public void onClick(View view) {
+        	synchronized( Connections.this ){	
+    			if( Connections.this.my_turn ){
 			        IndexedButton button = (IndexedButton)view;
 			        if( button.getRow() < 0 ){
 			        	boolean wasHighlighted = button.isHighlighted();
@@ -267,12 +505,8 @@ public class Connections extends Activity
 				        	removeAllHighlighting();		        		
 			        	}
 			        }
-        		}
-        		
-		        return true;
-		    } 
-        	
-        	return false;
+    			}
+    		}
         }
     }
 
@@ -398,7 +632,7 @@ public class Connections extends Activity
 	    return new String(Character.toChars(unicode));
 	}
     
-    private void initWidgetIds(){
+    private void initWidgetIds(){    	
     	player_card_ids [0] = R.id.playerCard0;
     	player_card_ids [1] = R.id.playerCard1;
     	player_card_ids [2] = R.id.playerCard2;

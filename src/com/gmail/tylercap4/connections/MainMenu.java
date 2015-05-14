@@ -16,6 +16,8 @@ import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.OnInvitationReceivedListener;
+import com.google.android.gms.games.multiplayer.Participant;
+import com.google.android.gms.games.multiplayer.ParticipantResult;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.turnbased.OnTurnBasedMatchUpdateReceivedListener;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
@@ -25,10 +27,16 @@ import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer.L
 import com.google.android.gms.plus.Plus;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +44,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceivedListener, OnInvitationReceivedListener, 
 												  ConnectionCallbacks, OnConnectionFailedListener
@@ -44,13 +51,17 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 	private static final String SIGNED_IN_KEY = "SIGNED_IN";
 	private static final int 	RC_SIGN_IN = 9001;
 	private static final int 	RC_SELECT_PLAYERS = 9002;
+	private static final int 	RC_GAMES_INBOX = 9003;
+	private static final String CONNECTED_SUCCESS_ACTION = "SUCCESSFULLY_CONNECTED";
 	
-	private static final String sign_in_row = "Sign in to access your games";
-	private static final String quick_match = "Quick Match";
-	private static final String choose_opponent = "Choose Opponent";
-//	private static final String invited = "You've been invited!";
-//	private static final String your_turn = "It's your turn!";
-//	private static final String match_ended = "Match has ended!";
+	private static final String SIGN_IN_ROW = "Sign in to access your games";
+//	private static final String QUICK_MATCH = "Quick Match";
+//	private static final String CHOOSE_OPPONENT = "Choose Opponent";
+	private static final String NEW_GAME = "New Game";
+	private static final String GAMES_INBOX = "Games Inbox";
+	private static final String INVITED = "You've been invited!";
+	private static final String YOUR_TURN = "It's your turn!";
+	private static final String MATCH_ENDED = "Match has ended!";
 	
 	private MenuItem sign_in;
 	
@@ -60,8 +71,11 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 	private boolean mResolvingConnectionFailure = false;
 	private boolean mSignInClicked = false;
 	
-	private List<String> game_strings;
+	private LoadMatchesResult previous_result;
+	
 	private List<TurnBasedMatch> matches;
+	private List<Invitation> invitations;
+	private List<String> game_strings;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +86,16 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 	@Override
 	protected void onResume(){
 		super.onResume();		
+		
+		MyReceiver receiver = new MyReceiver();
+
+        // The filter's action is CONNECTED_SUCCESS_ACTION
+        IntentFilter mStatusIntentFilter = new IntentFilter(CONNECTED_SUCCESS_ACTION);
+
+        // Registers the receiver with the new filter
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                receiver,
+                mStatusIntentFilter);
         
         mGoogleApiClient = new GoogleApiClient.Builder(this)
 		        .addConnectionCallbacks(this)
@@ -80,21 +104,15 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .build();	
     	
-    	reloadSignIn();
-    	
+        matches = new LinkedList<TurnBasedMatch>();
+        invitations = new LinkedList<Invitation>();
+        
+        reloadSignIn();    	
 		updateSignIn();
 	}
+	
 	private void updateSignIn(){
 		if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-			updateSignIn( true );
-		}
-		else{
-			updateSignIn( false );
-		}
-	}
-	
-	private void updateSignIn( boolean signed_in ){
-		if( signed_in ){
 			if( this.sign_in != null )
 				this.sign_in.setTitle(R.string.sign_out);
 
@@ -107,6 +125,13 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 		}
 		
 		updateGameList(this.mGoogleApiClient.isConnected());
+	}
+	
+	private void signedOut(){
+		if( this.sign_in != null )
+			this.sign_in.setTitle(R.string.sign_in);
+	
+		updateGameList(false);
 	}
 	
 	@Override
@@ -138,10 +163,45 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
     public void onConnected(Bundle connectionHint) {
     	mSignInClicked = false;
 	      
-    	Games.Invitations.registerInvitationListener(mGoogleApiClient, this);
-    	Games.TurnBasedMultiplayer.registerMatchUpdateListener(mGoogleApiClient, this);
-    	updateSignIn(true);
+    	final Runnable r = new Runnable() {
+    	    public void run() {
+    	    	boolean try_again = false;
+    	    	while( !mGoogleApiClient.isConnected() ){
+    	    		if( try_again ){
+    	    			try_again = false;
+    	    			mGoogleApiClient.connect();
+    	    		}
+    	    		else{
+    	    			try_again = true;
+    	    		}
+    	    		
+    	    		try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// Auto-generated catch block
+						e.printStackTrace();
+					}
+    	    	}
+    	    	
+    	    	//send a broadcast message for us to update our sign in
+    	    	Intent localIntent = new Intent(CONNECTED_SUCCESS_ACTION);
+                LocalBroadcastManager.getInstance(MainMenu.this).sendBroadcast(localIntent);
+    	    }
+    	};
+
+    	new Thread(r).start();
     }
+	
+	private void doOnConnected(){
+		if( mGoogleApiClient == null || !mGoogleApiClient.isConnected() ){
+			signedOut();
+		}
+		else{
+	    	Games.Invitations.registerInvitationListener(mGoogleApiClient, this);
+	    	Games.TurnBasedMultiplayer.registerMatchUpdateListener(mGoogleApiClient, this);
+	    	updateSignIn();
+		}
+	}
     
     public void onConnectionSuspended(int cause) {
     	mGoogleApiClient.connect();
@@ -173,86 +233,127 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
         }
     }
 	
-	private void updateGameList(boolean signed_in){		
-		game_strings = new LinkedList<String>();
-		if( signed_in && this.mGoogleApiClient.isConnected() ){
-			game_strings.add(quick_match);
-			game_strings.add(choose_opponent);
-			
-			//TODO: add open matches
-			matches = new LinkedList<TurnBasedMatch>();
-			int[] statuses = new int[] { TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN, TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN, TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE };
-			Games.TurnBasedMultiplayer.loadMatchesByStatus( mGoogleApiClient, statuses )
-				.setResultCallback( new ResultCallback<LoadMatchesResult>()
-				{
-					@Override
-					public void onResult( LoadMatchesResult result )
+	private void updateGameList(boolean signed_in){
+		synchronized(this){
+			if( signed_in && this.mGoogleApiClient.isConnected() ){				
+				// add open matches
+				int[] statuses = TurnBasedMatch.MATCH_TURN_STATUS_ALL;
+				Games.TurnBasedMultiplayer.loadMatchesByStatus( mGoogleApiClient, statuses )
+					.setResultCallback( new ResultCallback<LoadMatchesResult>()
 					{
-						if( result.getStatus().getStatusCode() != GamesStatusCodes.STATUS_OK )
+						@Override
+						public void onResult( LoadMatchesResult result )
 						{
-							System.out.println(result.getStatus().getStatusMessage());
-						}
-						else
-						{							
-							for( int i = 0; i < result.getMatches().getCompletedMatches().getCount(); i++ ){
-								TurnBasedMatch match = result.getMatches().getCompletedMatches().get( i ); 
-								matches.add( match );
-								String opponent = Model.getOpponentFromMatch(match).getDisplayName();
-								game_strings.add(opponent);
+							if( previous_result != null ){
+								previous_result.release();
 							}
 							
-//							for( int i = 0; i < result.getMatches().getInvitations().getCount(); i++ ){
-//								result.getMatches().getInvitations().get( i );
-//							}
-								
-							for( int i = 0; i < result.getMatches().getMyTurnMatches().getCount(); i++ ){
-								TurnBasedMatch match = result.getMatches().getMyTurnMatches().get( i ); 
-								matches.add( match );
-								String opponent = Model.getOpponentFromMatch(match).getDisplayName();
-								game_strings.add(opponent + ": Your Turn");
+							previous_result = result;
+							if( result.getStatus().getStatusCode() != GamesStatusCodes.STATUS_OK )
+							{
+								System.out.println(result.getStatus().getStatusMessage());
 							}
-								
-							for( int i = 0; i < result.getMatches().getTheirTurnMatches().getCount(); i++ ){
-								TurnBasedMatch match = result.getMatches().getTheirTurnMatches().get( i );								 
-								matches.add( match );
-								String opponent = Model.getOpponentFromMatch(match).getDisplayName();
-								game_strings.add(opponent + ": Their Turn");
-							}
-							
-							reloadDisplay();
-						}
-					}
-				});
-
-		}
-		else{
-			game_strings.add(sign_in_row);
-		}
-		reloadDisplay();	
-	}	
+							else
+							{
+								try{
+									game_strings = new LinkedList<String>();
+									matches = new LinkedList<TurnBasedMatch>();
+									invitations = new LinkedList<Invitation>();
 	
-//	            case GPGTurnBasedUserMatchStatusMatchCompleted: //Completed match
-//	                for (GPGTurnBasedParticipantResult *result in match.results)
-//	                {
-//	                    if( [result.participantId isEqualToString:[model getOpponent].participantId] ){
-//	                        // opponent result
-//	                        if( result.result == GPGTurnBasedParticipantResultStatusWin ){
-//	                            resultStr = @"You Lost";
-//	                        }
-//	                        if( result.result == GPGTurnBasedParticipantResultStatusLoss ){
-//	                            resultStr = @"You Won!";
-//	                        }
-//	                    }
-//	                    else{
-//	                        // my result
-//	                        if( result.result == GPGTurnBasedParticipantResultStatusWin ){
-//	                            resultStr = @"You Won!";
-//	                        }
-//	                        if( result.result == GPGTurnBasedParticipantResultStatusLoss ){
-//	                            resultStr = @"You Lost";
-//	                        }
-//	                    }
-//	                }		
+									game_strings.add(GAMES_INBOX);
+									game_strings.add(NEW_GAME);
+									
+									String myId = Games.Players.getCurrentPlayer(mGoogleApiClient).getPlayerId();
+																	
+									for( int i = 0; i < result.getMatches().getInvitations().getCount(); i++ ){
+										Invitation invite = result.getMatches().getInvitations().get( i ); 
+										invitations.add( invite );
+										String opponent = invite.getInviter().getDisplayName();
+										game_strings.add(opponent + ": Your Invited");
+									}
+										
+									for( int i = 0; i < result.getMatches().getMyTurnMatches().getCount(); i++ ){
+										TurnBasedMatch match = result.getMatches().getMyTurnMatches().get( i ); 
+										matches.add( match );
+										Participant opponentPart = Model.getOpponentFromMatch(match, myId);
+										String opponent = opponentPart.getDisplayName();
+										ParticipantResult pr = opponentPart.getResult();
+										
+										if( pr == null ){
+											game_strings.add(opponent + ": Your Turn");
+										}
+										else if( pr.getResult() == ParticipantResult.MATCH_RESULT_WIN ){
+											game_strings.add(opponent + ": You Lost");
+										}
+										else if( pr.getResult() == ParticipantResult.MATCH_RESULT_LOSS ){
+											game_strings.add(opponent + ": You Won!");
+										}
+										else{
+											game_strings.add(opponent + ": Your Turn");
+										}
+									}
+										
+									for( int i = 0; i < result.getMatches().getTheirTurnMatches().getCount(); i++ ){
+										TurnBasedMatch match = result.getMatches().getTheirTurnMatches().get( i );								 
+										matches.add( match );
+										Participant opponentPart = Model.getOpponentFromMatch(match, myId);
+										String opponent = opponentPart.getDisplayName();
+										ParticipantResult pr = opponentPart.getResult();
+										
+										if( pr == null ){
+											game_strings.add(opponent + ": Their Turn");
+										}
+										else if( pr.getResult() == ParticipantResult.MATCH_RESULT_WIN ){
+											game_strings.add(opponent + ": You Lost");
+										}
+										else if( pr.getResult() == ParticipantResult.MATCH_RESULT_LOSS ){
+											game_strings.add(opponent + ": You Won!");
+										}
+										else{
+											game_strings.add(opponent + ": Their Turn");
+										}
+									}
+									
+									for( int i = 0; i < result.getMatches().getCompletedMatches().getCount(); i++ ){
+										TurnBasedMatch match = result.getMatches().getCompletedMatches().get( i ); 
+										matches.add( match );
+	//									String myPartId = match.getParticipantId(myId);
+										Participant opponentPart = Model.getOpponentFromMatch(match, myId);
+										String opponent = opponentPart.getDisplayName();
+										ParticipantResult pr = opponentPart.getResult();
+										
+										if( pr == null ){
+											game_strings.add(opponent + ": Completed");
+										}
+										else if( pr.getResult() == ParticipantResult.MATCH_RESULT_WIN ){
+											game_strings.add(opponent + ": You Lost");
+										}
+										else if( pr.getResult() == ParticipantResult.MATCH_RESULT_LOSS ){
+											game_strings.add(opponent + ": You Won!");
+										}
+										else{
+											game_strings.add(opponent + ": Completed");
+										}
+									}
+									
+									reloadDisplay();
+								}
+								//						result.release();
+								catch( IllegalStateException ex ){
+									Model.showConnectionError(MainMenu.this, "Unable To Refresh Game List");
+								}								
+							}
+						}
+					});
+	
+			}
+			else{
+				game_strings = new LinkedList<String>();
+				game_strings.add(SIGN_IN_ROW);
+				reloadDisplay();	
+			}
+		}
+	}			
 
 	private void reloadDisplay(){
 		ListView games_list = (ListView) findViewById(R.id.games_list);
@@ -264,27 +365,115 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 	}
 
 	@Override
-	public void onTurnBasedMatchReceived(TurnBasedMatch arg0) {
-		// TODO Auto-generated method stub
+	public void onTurnBasedMatchReceived(final TurnBasedMatch match) {
+		// display info for match event
+		updateGameList(mGoogleApiClient!=null && mGoogleApiClient.isConnected());
 		
+		try{
+			String myId = Games.Players.getCurrentPlayer(mGoogleApiClient).getPlayerId();
+			String opponent = Model.getOpponentFromMatch(match, myId).getDisplayName();
+			
+			if( match.getStatus() == TurnBasedMatch.MATCH_STATUS_ACTIVE ){			
+				new AlertDialog.Builder(MainMenu.this)
+				    .setTitle(YOUR_TURN)
+				    .setMessage(opponent + " just took their turn in a match. Would you like to jump to that game now?")
+				    .setPositiveButton("Sure!", new DialogInterface.OnClickListener() {
+				        public void onClick(DialogInterface dialog, int which) {
+				        	// go to this match
+				        	openMatch(match);
+				        }
+				     })
+				     .setNegativeButton("No", new DialogInterface.OnClickListener() {
+				        public void onClick(DialogInterface dialog, int which) {
+				        	// do nothing
+				        }
+				     })
+				     .show();
+			}
+			else{
+				new AlertDialog.Builder(MainMenu.this)
+				    .setTitle(MATCH_ENDED)
+				    .setMessage(opponent + " just finished a match. Would you like to view the results now?")
+				    .setPositiveButton("Sure!", new DialogInterface.OnClickListener() {
+				        public void onClick(DialogInterface dialog, int which) {
+				        	// go to this match
+				        	openMatch(match);
+				        }
+				     })
+				     .setNegativeButton("No", new DialogInterface.OnClickListener() {
+				        public void onClick(DialogInterface dialog, int which) {
+				        	// do nothing
+				        }
+				     })
+				     .show();
+			}
+		}
+		catch(IllegalStateException ex){
+			Model.showConnectionError(MainMenu.this, "Unable To Go To Game");
+		}
+	}
+	
+	private void acceptInvitation(Invitation invitation){
+		try{
+        	Games.TurnBasedMultiplayer.acceptInvitation(mGoogleApiClient, invitation.getInvitationId())
+        							  .setResultCallback(new MatchInitiatedCallback());
+    	}
+    	catch(IllegalStateException ex){
+    		Model.showConnectionError(MainMenu.this, "Unable To Accept Invitation");
+    	}
 	}
 
 	@Override
 	public void onTurnBasedMatchRemoved(String matchId) {
-		// TODO Auto-generated method stub
-		
+		updateGameList(mGoogleApiClient!=null && mGoogleApiClient.isConnected());
 	}
 
 	@Override
-	public void onInvitationReceived(Invitation arg0) {
-		// TODO Auto-generated method stub
+	public void onInvitationReceived(Invitation invitation) {
+		updateGameList(mGoogleApiClient!=null && mGoogleApiClient.isConnected());
+		handleInvitation(invitation, false);
+	}
+	
+	private void handleInvitation(final Invitation invitation, final boolean decline) {
+		String opponent = invitation.getInviter().getDisplayName();
 		
+		String cancel = "Not Now";
+		if( decline ){
+			cancel = "Decline";
+		}
+		
+		new AlertDialog.Builder(MainMenu.this)
+		    .setTitle(INVITED)
+		    .setMessage(opponent + " just invited you to a game. Would you like to play now?")
+		    .setPositiveButton("Sure!", new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int which) {
+		        	// go to this match
+		        	acceptInvitation(invitation);
+		        }
+		     })
+		     .setNegativeButton(cancel, new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int which) {
+		        	if( decline ){
+			        	// decline invite
+		        		try{
+				        	Games.TurnBasedMultiplayer.declineInvitation(mGoogleApiClient, invitation.getInvitationId());
+				    		updateGameList(mGoogleApiClient!=null && mGoogleApiClient.isConnected());
+		        		}
+		        		catch(IllegalStateException ex){
+		        			Model.showConnectionError(MainMenu.this, "Unable To Decline Invitation");
+		        		}
+		        	}
+		        	else{
+		        		// just save it for later
+		        	}
+		        }
+		     })
+		     .show();
 	}
 
 	@Override
-	public void onInvitationRemoved(String arg0) {
-		// TODO Auto-generated method stub
-		
+	public void onInvitationRemoved(String matchId) {
+		updateGameList(mGoogleApiClient!=null && mGoogleApiClient.isConnected());
 	}
 	
 	private class GameClickListener implements OnItemClickListener
@@ -296,50 +485,69 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
     }
 	
 	private void selectItem(int position){
+//		System.out.println("Selected Item");
 		String game = game_strings.get(position);
 		
 		switch( game ){
-			case sign_in_row:
+			case SIGN_IN_ROW:
 				// do nothing
 				return;
-			case quick_match:
-				startQuickMatch();
+			case GAMES_INBOX:
+				loadInbox();
 				return;
-			case choose_opponent:
+			case NEW_GAME:
 				chooseOpponent();
 				return;
 		}
-
-		// open existing match
-		TurnBasedMatch match = matches.get(position - 2);
-		openMatch(match);		
+		
+		if( position >= 2 && position < (invitations.size() + 2) ){
+			// handle the invitation
+			Invitation invite = invitations.get(position - 2);
+			handleInvitation(invite, true);
+		}
+		else if( position >= (invitations.size() + 2) ){
+			// open existing match
+			TurnBasedMatch match = matches.get(position - (invitations.size() + 2));
+			
+			// for testing to delete invalid matches
+//			Games.TurnBasedMultiplayer.cancelMatch(mGoogleApiClient, match.getMatchId());
+//			Games.TurnBasedMultiplayer.dismissMatch(mGoogleApiClient, match.getMatchId());
+			openMatch(match);		
+		}
 	}
 	
-	private Model submitNewMatch(TurnBasedMatch match){
-		// submit the match to gpg with initial data
-		String myId = Games.Players.getCurrentPlayer(mGoogleApiClient).getPlayerId();
-		Model model = new Model(match, myId);
-		byte[] data = model.storeToData();
-		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(), data, myId);
-		
-		return model;
+	private void loadInbox(){
+		Intent inbox = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
+		startActivityForResult( inbox, RC_SELECT_PLAYERS );
 	}
 	
 	private void openMatch(TurnBasedMatch match){
-		String myId = Games.Players.getCurrentPlayer(mGoogleApiClient).getPlayerId();
-		Model model = new Model(match, myId);
-		openMatch(match.getMatchId(), model);
+		try{
+			String myId = Games.Players.getCurrentPlayer(mGoogleApiClient).getPlayerId();
+//			System.out.println("Create Model");
+			Model model = new Model(match, myId);
+			openMatch(match.getMatchId(), model);
+		}
+		catch(IllegalStateException ex){
+			Model.showConnectionError(MainMenu.this, "Unable To Open Match");
+		}
 	}
 	
 	private void openMatch(String id, Model model){
+//		System.out.println("Open Match");
 		Intent i = new Intent( this, Connections.class );
 		i.putExtra(Model.ID_TAG, id);
 		startActivity(i);
 	}
 	
 	private void chooseOpponent(){
-		Intent intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
-		startActivityForResult( intent, RC_SELECT_PLAYERS );
+		try{
+			Intent intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
+			startActivityForResult( intent, RC_SELECT_PLAYERS );
+		}
+		catch(IllegalStateException ex){
+			Model.showConnectionError(MainMenu.this, "Unable To Load Player Chooser");
+		}
 	}
 	
 	private void startQuickMatch(){
@@ -352,10 +560,15 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
                 .setAutoMatchCriteria(autoMatchCriteria)
                 .build();
 
-        // Create and start the match.
-        Games.TurnBasedMultiplayer
-            .createMatch(mGoogleApiClient, tbmc)
-            .setResultCallback(new MatchInitiatedCallback());
+        try{
+	        // Create and start the match.
+	        Games.TurnBasedMultiplayer
+	            .createMatch(mGoogleApiClient, tbmc)
+	            .setResultCallback(new MatchInitiatedCallback());
+        }
+        catch(IllegalStateException ex){
+        	Model.showConnectionError(MainMenu.this, "Unable To Create Match");
+        }
 	}
 	
 	@Override
@@ -377,7 +590,7 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
             }
         }
         else if (request == RC_SELECT_PLAYERS) {
-            if (response != Activity.RESULT_OK) {
+            if (response != RESULT_OK) {
                 // user canceled
                 return;
             }
@@ -391,64 +604,57 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
             	startQuickMatch();
             }
             else{
-            	TurnBasedMatchConfig tbmc = TurnBasedMatchConfig.builder()
+            	final TurnBasedMatchConfig tbmc = TurnBasedMatchConfig.builder()
                         .addInvitedPlayers(invitees)
                         .setAutoMatchCriteria(null)
                         .build();
 
                 // Create and start the match.
-                Games.TurnBasedMultiplayer
-                    .createMatch(mGoogleApiClient, tbmc)
-                    .setResultCallback(new MatchInitiatedCallback());
+            	// wait until we reconnect to call this
+            	final Runnable r = new Runnable() {
+            	    public void run() {
+            	    	while( !mGoogleApiClient.isConnected() ){
+            	    		try {
+								Thread.sleep(500);
+							} catch (InterruptedException e) {
+								// Auto-generated catch block
+								e.printStackTrace();
+							}
+            	    	}
+     
+            	    	try{
+	            	        Games.TurnBasedMultiplayer
+		                         .createMatch(mGoogleApiClient, tbmc)
+		                         .setResultCallback(new MatchInitiatedCallback());
+            	    	}
+            	    	catch(IllegalStateException ex){
+            	    		Model.showConnectionError(MainMenu.this, "Unable To Create Match");
+            	    	}
+            	    }
+            	};
+
+            	new Thread(r).start();
+            }
+        }
+        else if (request == RC_GAMES_INBOX) {
+            if (response != RESULT_OK) {
+                // user canceled
+                return;
+            }
+
+            TurnBasedMatch match = data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
+            if( match != null ){
+            	openMatch(match);
+            }
+            else{
+            	Invitation invite = data.getParcelableExtra(Multiplayer.EXTRA_INVITATION);
+            	
+            	if( invite != null ){
+            		
+            	}
             }
         }
     }
-	
-//	- (void)submitRematch:(GPGTurnBasedMatch*)match
-//	{
-//	    [match rematchWithCompletionHandler:^(GPGTurnBasedMatch *rematch, NSError *error) {
-//	        // submitNewMatch in MyTableViewController
-//	        [self submitNewMatch:rematch];
-//	    }];
-//	}
-//
-//	- (void)submitNewMatch:(GPGTurnBasedMatch*)match
-//	{
-//	    GPGTurnBasedParticipant *me = match.localParticipant;
-//	    if( me == nil ){
-//	        [[[UIAlertView alloc] initWithTitle:@"Unable To Create New Game"
-//	                                    message:@"Check you internet connection, or try again later."
-//	                                   delegate:self
-//	                          cancelButtonTitle:@"Okay"
-//	                          otherButtonTitles:nil] show];
-//	        
-//	        [match dismissWithCompletionHandler:nil];
-//	        [match cancelWithCompletionHandler:nil];
-//	        return;
-//	    }
-//	    
-//	    Model *model = [[Model alloc]init];
-//	    [model loadNewGame:match localParticipant:me];
-//	    
-//	    NSData *data = [model storeToData];
-//	    [match takeTurnWithNextParticipantId:me.participantId data:data results:match.results completionHandler:^(NSError *error)
-//	     {
-//	         if (error) {
-//	             [[[UIAlertView alloc] initWithTitle:@"Unable To Create New Game"
-//	                                         message:@"Check you internet connection, or try again later."
-//	                                        delegate:self
-//	                               cancelButtonTitle:@"Okay"
-//	                               otherButtonTitles:nil] show];
-//	             
-//	             [match dismissWithCompletionHandler:nil];
-//	             [match cancelWithCompletionHandler:nil];
-//	             return;
-//	         } else {
-//	             [self performSegueWithIdentifier:openGame sender:match];
-//	         }
-//	     }];
-//	    
-//	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -472,7 +678,7 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
                     Games.signOut(mGoogleApiClient);
                     mGoogleApiClient.clearDefaultAccountAndReconnect();
                     
-                    updateSignIn(false);
+                    signedOut();
                     updateGameList(false);
 			}
 			else if (!mGoogleApiClient.isConnecting()) {
@@ -491,14 +697,28 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 		public void onResult(TurnBasedMultiplayer.InitiateMatchResult result) {
 		    // Check if the status code is not success.
 		    Status status = result.getStatus();
-		    if (status.isSuccess()) {
-		    	Toast.makeText(MainMenu.this, status.getStatusMessage(), Toast.LENGTH_SHORT).show();
-		        return;
+		    if (!status.isSuccess()) {
+		    	Model.showConnectionError(MainMenu.this, "Unable To Submit Move");
 		    }
-		
-		    TurnBasedMatch match = result.getMatch();
-		
-		    openMatch(match.getMatchId(), submitNewMatch(match));
+		    else{
+			    TurnBasedMatch match = result.getMatch();
+			
+			    Model model = Model.submitNewMatch(match, mGoogleApiClient, MainMenu.this);
+			    if( model != null ){
+			    	openMatch(match.getMatchId(), model);
+			    }
+		    }
 		}
 	}
+	
+	public class MyReceiver extends BroadcastReceiver {
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+			  String action = intent.getAction();
+
+			  if( action.equals(CONNECTED_SUCCESS_ACTION) ) {
+				  doOnConnected();
+			  }
+		  }
+	} 
 }

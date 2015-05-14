@@ -569,6 +569,30 @@ android.support.v4.content.Loader -> android.support.v4.a.a:
     void dump(java.lang.String,java.io.FileDescriptor,java.io.PrintWriter,java.lang.String[]) -> a
 android.support.v4.content.Loader$OnLoadCompleteListener -> android.support.v4.a.b:
     void onLoadComplete(android.support.v4.content.Loader,java.lang.Object) -> a
+android.support.v4.content.LocalBroadcastManager -> android.support.v4.a.c:
+    android.content.Context mAppContext -> a
+    java.util.HashMap mReceivers -> b
+    java.util.HashMap mActions -> c
+    java.util.ArrayList mPendingBroadcasts -> d
+    android.os.Handler mHandler -> e
+    java.lang.Object mLock -> f
+    android.support.v4.content.LocalBroadcastManager mInstance -> g
+    android.support.v4.content.LocalBroadcastManager getInstance(android.content.Context) -> a
+    void registerReceiver(android.content.BroadcastReceiver,android.content.IntentFilter) -> a
+    boolean sendBroadcast(android.content.Intent) -> a
+    void executePendingBroadcasts() -> a
+    void access$000(android.support.v4.content.LocalBroadcastManager) -> a
+android.support.v4.content.LocalBroadcastManager$1 -> android.support.v4.a.d:
+    android.support.v4.content.LocalBroadcastManager this$0 -> a
+    void handleMessage(android.os.Message) -> handleMessage
+android.support.v4.content.LocalBroadcastManager$BroadcastRecord -> android.support.v4.a.e:
+    android.content.Intent intent -> a
+    java.util.ArrayList receivers -> b
+android.support.v4.content.LocalBroadcastManager$ReceiverRecord -> android.support.v4.a.f:
+    android.content.IntentFilter filter -> a
+    android.content.BroadcastReceiver receiver -> b
+    boolean broadcasting -> c
+    java.lang.String toString() -> toString
 android.support.v4.os.ParcelableCompat -> android.support.v4.b.a:
     android.os.Parcelable$Creator newCreator(android.support.v4.os.ParcelableCompatCreatorCallbacks) -> a
 android.support.v4.os.ParcelableCompat$CompatCreator -> android.support.v4.b.b:
@@ -1500,47 +1524,76 @@ android.support.v4.widget.ViewDragHelper$Callback -> android.support.v4.widget.x
     int clampViewPositionHorizontal(android.view.View,int,int) -> a
     int clampViewPositionVertical(android.view.View,int,int) -> b
 com.gmail.tylercap4.connections.Connections -> com.gmail.tylercap4.connections.Connections:
-    com.google.android.gms.ads.AdView adMobView -> a
-    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch match -> b
-    int owner -> c
-    int[][] widget_ids -> d
-    int[] player_card_ids -> e
-    com.gmail.tylercap4.connections.IndexedButton[][] widgets -> f
-    com.gmail.tylercap4.connections.IndexedButton[] player_cards -> g
-    int[][] gameboard -> h
-    int[][] owner_vals -> i
-    java.util.LinkedList deck -> j
-    int[] owner1_cards -> k
-    int[] owner2_cards -> l
+    com.google.android.gms.ads.AdView adMobView -> b
+    com.google.android.gms.common.api.GoogleApiClient mGoogleApiClient -> a
+    com.gmail.tylercap4.connections.Model model -> c
+    boolean my_turn -> d
+    int owner -> e
+    int[][] widget_ids -> f
+    int[] player_card_ids -> g
+    com.gmail.tylercap4.connections.IndexedButton[][] widgets -> h
+    com.gmail.tylercap4.connections.IndexedButton[] player_cards -> i
     void onCreate(android.os.Bundle) -> onCreate
     void onPause() -> onPause
     void onResume() -> onResume
-    void loadFromMatch() -> a
-    void doNewGame() -> b
-    void addHowToText() -> c
+    void setUpResignButton() -> a
+    void onConnected(android.os.Bundle) -> a
+    void onConnectionSuspended(int) -> a
+    void onConnectionFailed(com.google.android.gms.common.ConnectionResult) -> a
+    void addHowToText() -> b
+    void assignModelFromId(java.lang.String) -> a
+    void loadModel() -> c
     void setUpButton(com.gmail.tylercap4.connections.IndexedButton) -> a
-    java.util.LinkedList getEligibleDropTargets(int) -> a
-    int getNextPlayerOption(int,int) -> a
+    java.util.LinkedList getEligibleDropTargets(int) -> b
     void highlightTileClicked(com.gmail.tylercap4.connections.IndexedButton) -> b
-    void removeAllHighlighting() -> d
-    boolean checkForWinner(int,int,int) -> a
-    boolean checkDiagonal(int,int,int) -> b
-    boolean checkDiagonal1(int,int,int) -> c
-    boolean checkDiagonal2(int,int,int) -> d
-    java.lang.String getEmoji(int) -> b
-    void initWidgetIds() -> e
-    void access$0(com.gmail.tylercap4.connections.Connections) -> a
-    void access$1(com.gmail.tylercap4.connections.Connections,com.gmail.tylercap4.connections.IndexedButton) -> a
+    void doRematch() -> d
+    void doResign() -> e
+    void removeAllHighlighting() -> f
+    java.lang.String getEmoji(int) -> c
+    void initWidgetIds() -> g
+    boolean access$0(com.gmail.tylercap4.connections.Connections) -> a
+    void access$1(com.gmail.tylercap4.connections.Connections) -> b
+    void access$2(com.gmail.tylercap4.connections.Connections,com.gmail.tylercap4.connections.IndexedButton) -> a
+    void access$3(com.gmail.tylercap4.connections.Connections) -> c
+    void access$4(com.gmail.tylercap4.connections.Connections) -> d
+    com.gmail.tylercap4.connections.Model access$5(com.gmail.tylercap4.connections.Connections) -> e
 com.gmail.tylercap4.connections.Connections$1 -> com.gmail.tylercap4.connections.a:
     com.gmail.tylercap4.connections.Connections this$0 -> a
-    void onClick(android.content.DialogInterface,int) -> onClick
+    void onClick(android.view.View) -> onClick
 com.gmail.tylercap4.connections.Connections$2 -> com.gmail.tylercap4.connections.b:
     com.gmail.tylercap4.connections.Connections this$0 -> a
+    void onResult(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$UpdateMatchResult) -> a
+    void onResult(com.google.android.gms.common.api.Result) -> a
+    com.gmail.tylercap4.connections.Connections access$1(com.gmail.tylercap4.connections.Connections$2) -> a
+com.gmail.tylercap4.connections.Connections$2$1 -> com.gmail.tylercap4.connections.c:
+    com.gmail.tylercap4.connections.Connections$2 this$1 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
-com.gmail.tylercap4.connections.Connections$TileTouchListener -> com.gmail.tylercap4.connections.c:
+com.gmail.tylercap4.connections.Connections$2$2 -> com.gmail.tylercap4.connections.d:
+    com.gmail.tylercap4.connections.Connections$2 this$1 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.gmail.tylercap4.connections.Connections$3 -> com.gmail.tylercap4.connections.e:
     com.gmail.tylercap4.connections.Connections this$0 -> a
-    boolean onTouch(android.view.View,android.view.MotionEvent) -> onTouch
-com.gmail.tylercap4.connections.IndexedButton -> com.gmail.tylercap4.connections.d:
+    void onResult(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$UpdateMatchResult) -> a
+    void onResult(com.google.android.gms.common.api.Result) -> a
+com.gmail.tylercap4.connections.Connections$4 -> com.gmail.tylercap4.connections.f:
+    com.gmail.tylercap4.connections.Connections this$0 -> a
+    void onResult(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$InitiateMatchResult) -> a
+    void onResult(com.google.android.gms.common.api.Result) -> a
+com.gmail.tylercap4.connections.Connections$5 -> com.gmail.tylercap4.connections.g:
+    com.gmail.tylercap4.connections.Connections this$0 -> a
+    void onResult(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$UpdateMatchResult) -> a
+    void onResult(com.google.android.gms.common.api.Result) -> a
+    com.gmail.tylercap4.connections.Connections access$1(com.gmail.tylercap4.connections.Connections$5) -> a
+com.gmail.tylercap4.connections.Connections$5$1 -> com.gmail.tylercap4.connections.h:
+    com.gmail.tylercap4.connections.Connections$5 this$1 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.gmail.tylercap4.connections.Connections$5$2 -> com.gmail.tylercap4.connections.i:
+    com.gmail.tylercap4.connections.Connections$5 this$1 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.gmail.tylercap4.connections.Connections$TileClickListener -> com.gmail.tylercap4.connections.j:
+    com.gmail.tylercap4.connections.Connections this$0 -> a
+    void onClick(android.view.View) -> onClick
+com.gmail.tylercap4.connections.IndexedButton -> com.gmail.tylercap4.connections.k:
     int row -> a
     int column -> b
     int value -> c
@@ -1556,30 +1609,146 @@ com.gmail.tylercap4.connections.IndexedButton -> com.gmail.tylercap4.connections
     int getColumn() -> getColumn
     boolean performClick() -> performClick
 com.gmail.tylercap4.connections.MainMenu -> com.gmail.tylercap4.connections.MainMenu:
-    int RC_SIGN_IN -> b
-    android.view.MenuItem sign_in -> c
+    android.view.MenuItem sign_in -> b
     com.google.android.gms.common.api.GoogleApiClient mGoogleApiClient -> a
-    boolean mResolvingConnectionFailure -> d
-    boolean mSignInClicked -> e
-    java.util.List game_strings -> f
+    boolean mResolvingConnectionFailure -> c
+    boolean mSignInClicked -> d
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$LoadMatchesResult previous_result -> e
+    java.util.List matches -> f
+    java.util.List invitations -> g
+    java.util.List game_strings -> h
     void onCreate(android.os.Bundle) -> onCreate
     void onResume() -> onResume
-    void updateSignInButton() -> a
+    void updateSignIn() -> a
+    void signedOut() -> b
     void onPause() -> onPause
-    void onStart() -> onStart
-    void reloadSignIn() -> b
+    void reloadSignIn() -> c
     void onConnected(android.os.Bundle) -> a
+    void doOnConnected() -> d
     void onConnectionSuspended(int) -> a
     void onConnectionFailed(com.google.android.gms.common.ConnectionResult) -> a
-    void onActivityResult(int,int,android.content.Intent) -> onActivityResult
-    void updateGameList() -> c
+    void updateGameList(boolean) -> a
+    void reloadDisplay() -> e
+    void onTurnBasedMatchReceived(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch) -> a
+    void acceptInvitation(com.google.android.gms.games.multiplayer.Invitation) -> b
+    void onTurnBasedMatchRemoved(java.lang.String) -> a
+    void onInvitationReceived(com.google.android.gms.games.multiplayer.Invitation) -> a
+    void handleInvitation(com.google.android.gms.games.multiplayer.Invitation,boolean) -> a
+    void onInvitationRemoved(java.lang.String) -> b
     void selectItem(int) -> b
+    void loadInbox() -> f
+    void openMatch(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch) -> b
+    void openMatch(java.lang.String,com.gmail.tylercap4.connections.Model) -> a
+    void chooseOpponent() -> g
+    void startQuickMatch() -> h
+    void onActivityResult(int,int,android.content.Intent) -> onActivityResult
     boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
     boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
     void access$0(com.gmail.tylercap4.connections.MainMenu,int) -> a
-com.gmail.tylercap4.connections.MainMenu$GameClickListener -> com.gmail.tylercap4.connections.e:
+    void access$1(com.gmail.tylercap4.connections.MainMenu,java.lang.String,com.gmail.tylercap4.connections.Model) -> a
+    void access$2(com.gmail.tylercap4.connections.MainMenu) -> a
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$LoadMatchesResult access$3(com.gmail.tylercap4.connections.MainMenu) -> b
+    void access$4(com.gmail.tylercap4.connections.MainMenu,com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$LoadMatchesResult) -> a
+    void access$5(com.gmail.tylercap4.connections.MainMenu,java.util.List) -> a
+    void access$6(com.gmail.tylercap4.connections.MainMenu,java.util.List) -> b
+    void access$7(com.gmail.tylercap4.connections.MainMenu,java.util.List) -> c
+    java.util.List access$8(com.gmail.tylercap4.connections.MainMenu) -> c
+    java.util.List access$9(com.gmail.tylercap4.connections.MainMenu) -> d
+    java.util.List access$10(com.gmail.tylercap4.connections.MainMenu) -> e
+    void access$11(com.gmail.tylercap4.connections.MainMenu) -> f
+    void access$12(com.gmail.tylercap4.connections.MainMenu,com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch) -> a
+    void access$13(com.gmail.tylercap4.connections.MainMenu,com.google.android.gms.games.multiplayer.Invitation) -> a
+    void access$14(com.gmail.tylercap4.connections.MainMenu,boolean) -> a
+com.gmail.tylercap4.connections.MainMenu$1 -> com.gmail.tylercap4.connections.l:
+    com.gmail.tylercap4.connections.MainMenu this$0 -> a
+    void run() -> run
+com.gmail.tylercap4.connections.MainMenu$2 -> com.gmail.tylercap4.connections.m:
+    com.gmail.tylercap4.connections.MainMenu this$0 -> a
+    void onResult(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$LoadMatchesResult) -> a
+    void onResult(com.google.android.gms.common.api.Result) -> a
+com.gmail.tylercap4.connections.MainMenu$3 -> com.gmail.tylercap4.connections.n:
+    com.gmail.tylercap4.connections.MainMenu this$0 -> a
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch val$match -> b
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.gmail.tylercap4.connections.MainMenu$4 -> com.gmail.tylercap4.connections.o:
+    com.gmail.tylercap4.connections.MainMenu this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.gmail.tylercap4.connections.MainMenu$5 -> com.gmail.tylercap4.connections.p:
+    com.gmail.tylercap4.connections.MainMenu this$0 -> a
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch val$match -> b
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.gmail.tylercap4.connections.MainMenu$6 -> com.gmail.tylercap4.connections.q:
+    com.gmail.tylercap4.connections.MainMenu this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.gmail.tylercap4.connections.MainMenu$7 -> com.gmail.tylercap4.connections.r:
+    com.gmail.tylercap4.connections.MainMenu this$0 -> a
+    com.google.android.gms.games.multiplayer.Invitation val$invitation -> b
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.gmail.tylercap4.connections.MainMenu$8 -> com.gmail.tylercap4.connections.s:
+    com.gmail.tylercap4.connections.MainMenu this$0 -> a
+    boolean val$decline -> b
+    com.google.android.gms.games.multiplayer.Invitation val$invitation -> c
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.gmail.tylercap4.connections.MainMenu$9 -> com.gmail.tylercap4.connections.t:
+    com.gmail.tylercap4.connections.MainMenu this$0 -> a
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig val$tbmc -> b
+    void run() -> run
+com.gmail.tylercap4.connections.MainMenu$GameClickListener -> com.gmail.tylercap4.connections.u:
     com.gmail.tylercap4.connections.MainMenu this$0 -> a
     void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
+com.gmail.tylercap4.connections.MainMenu$MatchInitiatedCallback -> com.gmail.tylercap4.connections.v:
+    com.gmail.tylercap4.connections.MainMenu this$0 -> a
+    void onResult(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$InitiateMatchResult) -> a
+    void onResult(com.google.android.gms.common.api.Result) -> a
+com.gmail.tylercap4.connections.MainMenu$MyReceiver -> com.gmail.tylercap4.connections.w:
+    com.gmail.tylercap4.connections.MainMenu this$0 -> a
+    void onReceive(android.content.Context,android.content.Intent) -> onReceive
+com.gmail.tylercap4.connections.Model -> com.gmail.tylercap4.connections.x:
+    java.util.Map ID_TO_MODEL_MAP -> a
+    java.lang.String myId -> b
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch match -> c
+    int[][] gameboard -> d
+    int[][] owner_vals -> e
+    java.util.LinkedList deck -> f
+    int[] owner1_cards -> g
+    int[] owner2_cards -> h
+    int owners_turn -> i
+    void loadFromMatch() -> g
+    byte[] storeToData() -> a
+    int[][] decode2DArray(java.lang.String) -> a
+    int[] decode1DArray(java.lang.String) -> b
+    java.util.LinkedList decodeArrayToList(java.lang.String) -> c
+    java.lang.String getGameboardString() -> h
+    java.lang.String getOwnersString() -> i
+    java.lang.String getP1CardsString() -> j
+    java.lang.String getP2CardsString() -> k
+    java.lang.String getDeckString() -> l
+    void doNewGame() -> m
+    java.lang.String getMyPartId() -> b
+    boolean isMyTurn() -> c
+    int getOwnerForMe(android.content.Context) -> a
+    void flipTurn() -> d
+    com.gmail.tylercap4.connections.Model submitNewMatch(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch,com.google.android.gms.common.api.GoogleApiClient,android.content.Context) -> a
+    java.lang.String getMatchId() -> e
+    com.google.android.gms.games.multiplayer.Participant getOpponent() -> f
+    com.google.android.gms.games.multiplayer.Participant getOpponentFromMatch(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch,java.lang.String) -> a
+    int getNextPlayerOption(int,int) -> a
+    int getPlayerCardAt(int,int) -> b
+    void setOwnerAt(int,int,int) -> a
+    int getOwnerAt(int,int) -> c
+    int getValueAt(int,int) -> d
+    boolean checkForWinner(int,int,int) -> b
+    boolean checkDiagonal(int,int,int) -> c
+    boolean checkDiagonal1(int,int,int) -> d
+    boolean checkDiagonal2(int,int,int) -> e
+    void showConnectionError(android.content.Context,java.lang.String) -> a
+com.gmail.tylercap4.connections.Model$1 -> com.gmail.tylercap4.connections.y:
+    android.content.Context val$context -> a
+    void onResult(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$UpdateMatchResult) -> a
+    void onResult(com.google.android.gms.common.api.Result) -> a
+com.gmail.tylercap4.connections.Model$1$1 -> com.gmail.tylercap4.connections.z:
+    com.gmail.tylercap4.connections.Model$1 this$1 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
 com.gmail.tylercap4.connections.basegameutils.BaseGameUtils -> com.gmail.tylercap4.connections.a.a:
     void showAlert(android.app.Activity,java.lang.String) -> a
     boolean resolveConnectionFailure(android.app.Activity,com.google.android.gms.common.api.GoogleApiClient,com.google.android.gms.common.ConnectionResult,int,java.lang.String) -> a
@@ -2180,7 +2349,9 @@ com.google.android.gms.common.api.BaseImplementation$b -> com.google.android.gms
 com.google.android.gms.common.api.CommonStatusCodes -> com.google.android.gms.common.api.o:
     java.lang.String getStatusCodeString(int) -> a
 com.google.android.gms.common.api.GoogleApiClient -> com.google.android.gms.common.api.p:
-    com.google.android.gms.common.api.BaseImplementation$a b(com.google.android.gms.common.api.BaseImplementation$a) -> a
+    com.google.android.gms.common.api.BaseImplementation$a a(com.google.android.gms.common.api.BaseImplementation$a) -> a
+    com.google.android.gms.common.api.BaseImplementation$a b(com.google.android.gms.common.api.BaseImplementation$a) -> b
+    com.google.android.gms.common.api.d d(java.lang.Object) -> a
     com.google.android.gms.common.api.Api$a a(com.google.android.gms.common.api.Api$c) -> a
     android.os.Looper getLooper() -> a
     void connect() -> b
@@ -2226,7 +2397,7 @@ com.google.android.gms.common.api.PendingResult$a -> com.google.android.gms.comm
 com.google.android.gms.common.api.Releasable -> com.google.android.gms.common.api.v:
     void release() -> a
 com.google.android.gms.common.api.Result -> com.google.android.gms.common.api.w:
-    com.google.android.gms.common.api.Status getStatus() -> a
+    com.google.android.gms.common.api.Status getStatus() -> b
 com.google.android.gms.common.api.ResultCallback -> com.google.android.gms.common.api.x:
     void onResult(com.google.android.gms.common.api.Result) -> a
 com.google.android.gms.common.api.Scope -> com.google.android.gms.common.api.Scope:
@@ -2250,7 +2421,7 @@ com.google.android.gms.common.api.Status -> com.google.android.gms.common.api.St
     int Iv -> g
     java.lang.String KB -> h
     android.app.PendingIntent mPendingIntent -> i
-    android.app.PendingIntent gP() -> b
+    android.app.PendingIntent gP() -> a
     java.lang.String getStatusMessage() -> c
     int getVersionCode() -> d
     boolean isSuccess() -> e
@@ -2261,14 +2432,19 @@ com.google.android.gms.common.api.Status -> com.google.android.gms.common.api.St
     java.lang.String toString() -> toString
     int describeContents() -> describeContents
     void writeToParcel(android.os.Parcel,int) -> writeToParcel
-    com.google.android.gms.common.api.Status getStatus() -> a
+    com.google.android.gms.common.api.Status getStatus() -> b
 com.google.android.gms.common.api.StatusCreator -> com.google.android.gms.common.api.y:
     com.google.android.gms.common.api.Status createFromParcel(android.os.Parcel) -> a
     com.google.android.gms.common.api.Status[] newArray(int) -> a
     void a(com.google.android.gms.common.api.Status,android.os.Parcel,int) -> a
     java.lang.Object[] newArray(int) -> newArray
     java.lang.Object createFromParcel(android.os.Parcel) -> createFromParcel
-com.google.android.gms.common.api.c -> com.google.android.gms.common.api.z:
+com.google.android.gms.common.api.b -> com.google.android.gms.common.api.z:
+    com.google.android.gms.common.api.Status Eb -> a
+    com.google.android.gms.common.data.DataHolder JG -> b
+    com.google.android.gms.common.api.Status getStatus() -> b
+    void release() -> a
+com.google.android.gms.common.api.c -> com.google.android.gms.common.api.aa:
     java.util.concurrent.locks.Lock zO -> e
     java.util.concurrent.locks.Condition JR -> f
     com.google.android.gms.internal.jm JS -> g
@@ -2297,9 +2473,11 @@ com.google.android.gms.common.api.c -> com.google.android.gms.common.api.z:
     com.google.android.gms.internal.jm$b Km -> z
     com.google.android.gms.common.api.Api$a a(com.google.android.gms.common.api.Api$b,java.lang.Object,android.content.Context,android.os.Looper,com.google.android.gms.internal.jg,com.google.android.gms.common.api.GoogleApiClient$ConnectionCallbacks,com.google.android.gms.common.api.GoogleApiClient$OnConnectionFailedListener) -> a
     void gJ() -> i
-    com.google.android.gms.common.api.BaseImplementation$a b(com.google.android.gms.common.api.BaseImplementation$a) -> a
+    com.google.android.gms.common.api.BaseImplementation$a a(com.google.android.gms.common.api.BaseImplementation$a) -> a
+    com.google.android.gms.common.api.BaseImplementation$a b(com.google.android.gms.common.api.BaseImplementation$a) -> b
     void a(com.google.android.gms.common.api.c$d) -> a
     void gK() -> j
+    com.google.android.gms.common.api.d d(java.lang.Object) -> a
     com.google.android.gms.common.api.Api$a a(com.google.android.gms.common.api.Api$c) -> a
     void connect() -> b
     void disconnect() -> c
@@ -2334,67 +2512,76 @@ com.google.android.gms.common.api.c -> com.google.android.gms.common.api.z:
     com.google.android.gms.common.ConnectionResult a(com.google.android.gms.common.api.c,com.google.android.gms.common.ConnectionResult) -> a
     int b(com.google.android.gms.common.api.c,int) -> b
     void a(com.google.android.gms.common.api.c,com.google.android.gms.common.api.GoogleApiClient,com.google.android.gms.common.api.f,boolean) -> a
-com.google.android.gms.common.api.c$1 -> com.google.android.gms.common.api.aa:
+com.google.android.gms.common.api.c$1 -> com.google.android.gms.common.api.ab:
     com.google.android.gms.common.api.c Kn -> a
     void b(com.google.android.gms.common.api.c$d) -> a
-com.google.android.gms.common.api.c$2 -> com.google.android.gms.common.api.ab:
+com.google.android.gms.common.api.c$2 -> com.google.android.gms.common.api.ac:
     com.google.android.gms.common.api.c Kn -> a
     void onConnected(android.os.Bundle) -> a
     void onConnectionSuspended(int) -> a
-com.google.android.gms.common.api.c$3 -> com.google.android.gms.common.api.ac:
+com.google.android.gms.common.api.c$3 -> com.google.android.gms.common.api.ad:
     com.google.android.gms.common.api.c Kn -> a
     boolean gN() -> l_
     boolean isConnected() -> c
     android.os.Bundle fX() -> k_
-com.google.android.gms.common.api.c$4 -> com.google.android.gms.common.api.ad:
+com.google.android.gms.common.api.c$4 -> com.google.android.gms.common.api.ae:
     com.google.android.gms.common.api.Api$b Ko -> a
     com.google.android.gms.common.api.c Kn -> b
     void onConnectionFailed(com.google.android.gms.common.ConnectionResult) -> a
-com.google.android.gms.common.api.c$5 -> com.google.android.gms.common.api.ae:
+com.google.android.gms.common.api.c$5 -> com.google.android.gms.common.api.af:
     java.util.concurrent.atomic.AtomicReference Kp -> a
     com.google.android.gms.common.api.f Kq -> b
     com.google.android.gms.common.api.c Kn -> c
     void onConnected(android.os.Bundle) -> a
     void onConnectionSuspended(int) -> a
-com.google.android.gms.common.api.c$6 -> com.google.android.gms.common.api.af:
+com.google.android.gms.common.api.c$6 -> com.google.android.gms.common.api.ag:
     com.google.android.gms.common.api.f Kq -> a
     com.google.android.gms.common.api.c Kn -> b
     void onConnectionFailed(com.google.android.gms.common.ConnectionResult) -> a
-com.google.android.gms.common.api.c$7 -> com.google.android.gms.common.api.ag:
+com.google.android.gms.common.api.c$7 -> com.google.android.gms.common.api.ah:
     com.google.android.gms.common.api.f Kq -> a
     boolean Kr -> b
     com.google.android.gms.common.api.GoogleApiClient GB -> c
     com.google.android.gms.common.api.c Kn -> d
     void j(com.google.android.gms.common.api.Status) -> a
     void onResult(com.google.android.gms.common.api.Result) -> a
-com.google.android.gms.common.api.c$a -> com.google.android.gms.common.api.ah:
+com.google.android.gms.common.api.c$a -> com.google.android.gms.common.api.ai:
     java.lang.ref.WeakReference Ks -> a
     void onReceive(android.content.Context,android.content.Intent) -> onReceive
-com.google.android.gms.common.api.c$b -> com.google.android.gms.common.api.ai:
+com.google.android.gms.common.api.c$b -> com.google.android.gms.common.api.aj:
     void b(com.google.android.gms.common.api.c$d) -> a
-com.google.android.gms.common.api.c$c -> com.google.android.gms.common.api.aj:
+com.google.android.gms.common.api.c$c -> com.google.android.gms.common.api.ak:
     com.google.android.gms.common.api.c Kn -> a
     void handleMessage(android.os.Message) -> handleMessage
-com.google.android.gms.common.api.c$d -> com.google.android.gms.common.api.ak:
+com.google.android.gms.common.api.c$d -> com.google.android.gms.common.api.al:
     void cancel() -> b
     com.google.android.gms.common.api.Api$c gz() -> f
     void b(com.google.android.gms.common.api.Api$a) -> a
     void l(com.google.android.gms.common.api.Status) -> b
     void a(com.google.android.gms.common.api.c$b) -> a
     int gF() -> g
-com.google.android.gms.common.api.d -> com.google.android.gms.common.api.al:
-    java.lang.Object mListener -> a
+com.google.android.gms.common.api.d -> com.google.android.gms.common.api.am:
+    com.google.android.gms.common.api.d$a Kt -> a
+    java.lang.Object mListener -> b
+    void a(com.google.android.gms.common.api.d$b) -> a
     void clear() -> a
-com.google.android.gms.common.api.e -> com.google.android.gms.common.api.am:
+    void b(com.google.android.gms.common.api.d$b) -> b
+com.google.android.gms.common.api.d$a -> com.google.android.gms.common.api.an:
+    com.google.android.gms.common.api.d Ku -> a
+    void handleMessage(android.os.Message) -> handleMessage
+com.google.android.gms.common.api.d$b -> com.google.android.gms.common.api.ao:
+    void c(java.lang.Object) -> a
+    void gG() -> a
+com.google.android.gms.common.api.e -> com.google.android.gms.common.api.ap:
     com.google.android.gms.common.api.Scope z(android.os.Parcel) -> a
     com.google.android.gms.common.api.Scope[] am(int) -> a
     void a(com.google.android.gms.common.api.Scope,android.os.Parcel,int) -> a
     java.lang.Object[] newArray(int) -> newArray
     java.lang.Object createFromParcel(android.os.Parcel) -> createFromParcel
-com.google.android.gms.common.api.f -> com.google.android.gms.common.api.an:
+com.google.android.gms.common.api.f -> com.google.android.gms.common.api.aq:
     com.google.android.gms.common.api.Status b(com.google.android.gms.common.api.Status) -> b
     com.google.android.gms.common.api.Result c(com.google.android.gms.common.api.Status) -> a
-com.google.android.gms.common.api.g -> com.google.android.gms.common.api.ao:
+com.google.android.gms.common.api.g -> com.google.android.gms.common.api.ar:
     boolean KC -> a
     int KD -> b
     com.google.android.gms.common.ConnectionResult KE -> c
@@ -2421,8 +2608,8 @@ com.google.android.gms.common.api.g -> com.google.android.gms.common.api.ao:
     void onLoadFinished(android.support.v4.content.Loader,java.lang.Object) -> a
     void a(com.google.android.gms.common.api.g) -> a
     void a(com.google.android.gms.common.api.g,int,com.google.android.gms.common.ConnectionResult) -> a
-com.google.android.gms.common.api.g$1 -> com.google.android.gms.common.api.ap:
-com.google.android.gms.common.api.g$a -> com.google.android.gms.common.api.aq:
+com.google.android.gms.common.api.g$1 -> com.google.android.gms.common.api.as:
+com.google.android.gms.common.api.g$a -> com.google.android.gms.common.api.at:
     com.google.android.gms.common.api.GoogleApiClient KH -> i
     boolean KI -> j
     com.google.android.gms.common.ConnectionResult KJ -> k
@@ -2434,10 +2621,10 @@ com.google.android.gms.common.api.g$a -> com.google.android.gms.common.api.aq:
     void onConnectionSuspended(int) -> a
     void onConnectionFailed(com.google.android.gms.common.ConnectionResult) -> a
     void a(com.google.android.gms.common.ConnectionResult) -> b
-com.google.android.gms.common.api.g$b -> com.google.android.gms.common.api.ar:
+com.google.android.gms.common.api.g$b -> com.google.android.gms.common.api.au:
     com.google.android.gms.common.api.GoogleApiClient KH -> a
     com.google.android.gms.common.api.GoogleApiClient$OnConnectionFailedListener KK -> b
-com.google.android.gms.common.api.g$c -> com.google.android.gms.common.api.as:
+com.google.android.gms.common.api.g$c -> com.google.android.gms.common.api.av:
     int KL -> b
     com.google.android.gms.common.ConnectionResult KM -> c
     com.google.android.gms.common.api.g KN -> a
@@ -2485,6 +2672,12 @@ com.google.android.gms.common.b -> com.google.android.gms.common.k:
 com.google.android.gms.common.b$1 -> com.google.android.gms.common.l:
     int c(byte[],byte[]) -> a
     int compare(java.lang.Object,java.lang.Object) -> compare
+com.google.android.gms.common.data.DataBuffer -> com.google.android.gms.common.data.b:
+    com.google.android.gms.common.data.DataHolder JG -> a
+    int getCount() -> b
+    java.lang.Object get(int) -> a
+    java.util.Iterator iterator() -> iterator
+    void release() -> a
 com.google.android.gms.common.data.DataHolder -> com.google.android.gms.common.data.DataHolder:
     com.google.android.gms.common.data.f CREATOR -> CREATOR
     int CK -> e
@@ -2499,6 +2692,7 @@ com.google.android.gms.common.data.DataHolder -> com.google.android.gms.common.d
     java.lang.Object Lj -> j
     boolean Lk -> k
     com.google.android.gms.common.data.DataHolder$a Ll -> l
+    void e(java.lang.Object) -> a
     void gX() -> a
     int describeContents() -> describeContents
     void writeToParcel(android.os.Parcel,int) -> writeToParcel
@@ -2522,15 +2716,15 @@ com.google.android.gms.common.data.DataHolder -> com.google.android.gms.common.d
     boolean isClosed() -> h
     void close() -> i
     void finalize() -> finalize
-com.google.android.gms.common.data.DataHolder$1 -> com.google.android.gms.common.data.b:
-com.google.android.gms.common.data.DataHolder$a -> com.google.android.gms.common.data.c:
+com.google.android.gms.common.data.DataHolder$1 -> com.google.android.gms.common.data.c:
+com.google.android.gms.common.data.DataHolder$a -> com.google.android.gms.common.data.d:
     java.lang.String[] Ld -> a
     java.util.ArrayList Lm -> b
     java.lang.String Ln -> c
     java.util.HashMap Lo -> d
     boolean Lp -> e
     java.lang.String Lq -> f
-com.google.android.gms.common.data.Freezable -> com.google.android.gms.common.data.d:
+com.google.android.gms.common.data.Freezable -> com.google.android.gms.common.data.e:
     java.lang.Object freeze() -> a
 com.google.android.gms.common.data.a -> com.google.android.gms.common.data.a:
     android.os.Parcelable$Creator CREATOR -> CREATOR
@@ -2544,13 +2738,19 @@ com.google.android.gms.common.data.a -> com.google.android.gms.common.data.a:
     void writeToParcel(android.os.Parcel,int) -> writeToParcel
     java.io.FileOutputStream gU() -> a
     void a(java.io.Closeable) -> a
-com.google.android.gms.common.data.b -> com.google.android.gms.common.data.e:
+com.google.android.gms.common.data.b -> com.google.android.gms.common.data.f:
     com.google.android.gms.common.data.a A(android.os.Parcel) -> a
     com.google.android.gms.common.data.a[] ar(int) -> a
     void a(com.google.android.gms.common.data.a,android.os.Parcel,int) -> a
     java.lang.Object[] newArray(int) -> newArray
     java.lang.Object createFromParcel(android.os.Parcel) -> createFromParcel
-com.google.android.gms.common.data.d -> com.google.android.gms.common.data.f:
+com.google.android.gms.common.data.c -> com.google.android.gms.common.data.g:
+    com.google.android.gms.common.data.DataBuffer KW -> a
+    int KX -> b
+    boolean hasNext() -> hasNext
+    java.lang.Object next() -> next
+    void remove() -> remove
+com.google.android.gms.common.data.d -> com.google.android.gms.common.data.h:
     com.google.android.gms.common.data.DataHolder JG -> a
     int KZ -> b
     int La -> c
@@ -2567,12 +2767,23 @@ com.google.android.gms.common.data.d -> com.google.android.gms.common.data.f:
     boolean aS(java.lang.String) -> i
     int hashCode() -> hashCode
     boolean equals(java.lang.Object) -> equals
-com.google.android.gms.common.data.f -> com.google.android.gms.common.data.g:
+com.google.android.gms.common.data.f -> com.google.android.gms.common.data.i:
     com.google.android.gms.common.data.DataHolder B(android.os.Parcel) -> a
     com.google.android.gms.common.data.DataHolder[] aw(int) -> a
     void a(com.google.android.gms.common.data.DataHolder,android.os.Parcel,int) -> a
     java.lang.Object[] newArray(int) -> newArray
     java.lang.Object createFromParcel(android.os.Parcel) -> createFromParcel
+com.google.android.gms.common.data.g -> com.google.android.gms.common.data.j:
+    boolean Lr -> b
+    java.util.ArrayList Ls -> c
+    java.lang.Object get(int) -> a
+    int getCount() -> b
+    java.lang.Object f(int,int) -> a
+    java.lang.String ha() -> c
+    void hb() -> e
+    int ax(int) -> b
+    int ay(int) -> c
+    java.lang.String hc() -> d
 com.google.android.gms.common.images.ImageManager -> com.google.android.gms.common.images.ImageManager:
     java.lang.Object Lu -> a
     java.util.HashSet Lv -> b
@@ -4911,8 +5122,8 @@ com.google.android.gms.fitness.result.BleDevicesResult -> com.google.android.gms
     java.util.List Wq -> b
     com.google.android.gms.common.api.Status Eb -> c
     android.os.Parcelable$Creator CREATOR -> CREATOR
-    java.util.List getClaimedBleDevices() -> b
-    com.google.android.gms.common.api.Status getStatus() -> a
+    java.util.List getClaimedBleDevices() -> a
+    com.google.android.gms.common.api.Status getStatus() -> b
     boolean equals(java.lang.Object) -> equals
     boolean b(com.google.android.gms.fitness.result.BleDevicesResult) -> a
     int hashCode() -> hashCode
@@ -4929,8 +5140,8 @@ com.google.android.gms.fitness.result.DataReadResult -> com.google.android.gms.f
     java.util.List Uk -> f
     java.util.List Wt -> g
     android.os.Parcelable$Creator CREATOR -> CREATOR
-    int kr() -> b
-    com.google.android.gms.common.api.Status getStatus() -> a
+    int kr() -> a
+    com.google.android.gms.common.api.Status getStatus() -> b
     boolean equals(java.lang.Object) -> equals
     boolean c(com.google.android.gms.fitness.result.DataReadResult) -> a
     int hashCode() -> hashCode
@@ -4947,8 +5158,8 @@ com.google.android.gms.fitness.result.DataSourcesResult -> com.google.android.gm
     java.util.List VH -> b
     com.google.android.gms.common.api.Status Eb -> c
     android.os.Parcelable$Creator CREATOR -> CREATOR
-    java.util.List getDataSources() -> b
-    com.google.android.gms.common.api.Status getStatus() -> a
+    java.util.List getDataSources() -> a
+    com.google.android.gms.common.api.Status getStatus() -> b
     boolean equals(java.lang.Object) -> equals
     boolean b(com.google.android.gms.fitness.result.DataSourcesResult) -> a
     int hashCode() -> hashCode
@@ -4961,8 +5172,8 @@ com.google.android.gms.fitness.result.DataTypeResult -> com.google.android.gms.f
     com.google.android.gms.common.api.Status Eb -> b
     com.google.android.gms.fitness.data.DataType TM -> c
     android.os.Parcelable$Creator CREATOR -> CREATOR
-    com.google.android.gms.common.api.Status getStatus() -> a
-    com.google.android.gms.fitness.data.DataType getDataType() -> b
+    com.google.android.gms.common.api.Status getStatus() -> b
+    com.google.android.gms.fitness.data.DataType getDataType() -> a
     boolean equals(java.lang.Object) -> equals
     boolean b(com.google.android.gms.fitness.result.DataTypeResult) -> a
     int hashCode() -> hashCode
@@ -4975,8 +5186,8 @@ com.google.android.gms.fitness.result.ListSubscriptionsResult -> com.google.andr
     java.util.List Wu -> b
     com.google.android.gms.common.api.Status Eb -> c
     android.os.Parcelable$Creator CREATOR -> CREATOR
-    java.util.List getSubscriptions() -> b
-    com.google.android.gms.common.api.Status getStatus() -> a
+    java.util.List getSubscriptions() -> a
+    com.google.android.gms.common.api.Status getStatus() -> b
     boolean equals(java.lang.Object) -> equals
     boolean b(com.google.android.gms.fitness.result.ListSubscriptionsResult) -> a
     int hashCode() -> hashCode
@@ -4990,9 +5201,9 @@ com.google.android.gms.fitness.result.SessionReadResult -> com.google.android.gm
     java.util.List Wv -> c
     com.google.android.gms.common.api.Status Eb -> d
     android.os.Parcelable$Creator CREATOR -> CREATOR
-    java.util.List getSessions() -> b
+    java.util.List getSessions() -> a
     java.util.List kv() -> c
-    com.google.android.gms.common.api.Status getStatus() -> a
+    com.google.android.gms.common.api.Status getStatus() -> b
     boolean equals(java.lang.Object) -> equals
     boolean b(com.google.android.gms.fitness.result.SessionReadResult) -> a
     int hashCode() -> hashCode
@@ -5005,8 +5216,8 @@ com.google.android.gms.fitness.result.SessionStopResult -> com.google.android.gm
     com.google.android.gms.common.api.Status Eb -> b
     java.util.List VI -> c
     android.os.Parcelable$Creator CREATOR -> CREATOR
-    com.google.android.gms.common.api.Status getStatus() -> a
-    java.util.List getSessions() -> b
+    com.google.android.gms.common.api.Status getStatus() -> b
+    java.util.List getSessions() -> a
     boolean equals(java.lang.Object) -> equals
     boolean b(com.google.android.gms.fitness.result.SessionStopResult) -> a
     int hashCode() -> hashCode
@@ -5233,7 +5444,9 @@ com.google.android.gms.games.Games -> com.google.android.gms.games.c:
     com.google.android.gms.games.request.Requests Requests -> r
     com.google.android.gms.games.snapshot.Snapshots Snapshots -> s
     com.google.android.gms.games.internal.game.Acls WZ -> t
-    com.google.android.gms.common.api.PendingResult signOut(com.google.android.gms.common.api.GoogleApiClient) -> a
+    com.google.android.gms.games.internal.GamesClientImpl d(com.google.android.gms.common.api.GoogleApiClient) -> a
+    com.google.android.gms.games.internal.GamesClientImpl e(com.google.android.gms.common.api.GoogleApiClient) -> b
+    com.google.android.gms.common.api.PendingResult signOut(com.google.android.gms.common.api.GoogleApiClient) -> c
 com.google.android.gms.games.Games$1 -> com.google.android.gms.games.d:
     com.google.android.gms.games.internal.GamesClientImpl a(android.content.Context,android.os.Looper,com.google.android.gms.internal.jg,com.google.android.gms.games.Games$GamesOptions,com.google.android.gms.common.api.GoogleApiClient$ConnectionCallbacks,com.google.android.gms.common.api.GoogleApiClient$OnConnectionFailedListener) -> a
     int getPriority() -> a
@@ -5269,6 +5482,9 @@ com.google.android.gms.games.Player -> com.google.android.gms.games.Player:
     java.lang.String getTitle() -> l
     com.google.android.gms.games.PlayerLevelInfo getLevelInfo() -> m
     com.google.android.gms.games.internal.player.MostRecentGameInfo kF() -> n
+com.google.android.gms.games.PlayerBuffer -> com.google.android.gms.games.k:
+    com.google.android.gms.games.Player get(int) -> b
+    java.lang.Object get(int) -> a
 com.google.android.gms.games.PlayerEntity -> com.google.android.gms.games.PlayerEntity:
     android.os.Parcelable$Creator CREATOR -> CREATOR
     int CK -> a
@@ -5312,10 +5528,10 @@ com.google.android.gms.games.PlayerEntity -> com.google.android.gms.games.Player
     java.lang.Integer kD() -> q
     boolean b(java.lang.Integer) -> a
     boolean bz(java.lang.String) -> a
-com.google.android.gms.games.PlayerEntity$PlayerEntityCreatorCompat -> com.google.android.gms.games.k:
+com.google.android.gms.games.PlayerEntity$PlayerEntityCreatorCompat -> com.google.android.gms.games.l:
     com.google.android.gms.games.PlayerEntity cm(android.os.Parcel) -> a
     java.lang.Object createFromParcel(android.os.Parcel) -> createFromParcel
-com.google.android.gms.games.PlayerEntityCreator -> com.google.android.gms.games.l:
+com.google.android.gms.games.PlayerEntityCreator -> com.google.android.gms.games.m:
     com.google.android.gms.games.PlayerEntity cm(android.os.Parcel) -> a
     com.google.android.gms.games.PlayerEntity[] dH(int) -> a
     void a(com.google.android.gms.games.PlayerEntity,android.os.Parcel,int) -> a
@@ -5336,7 +5552,7 @@ com.google.android.gms.games.PlayerLevel -> com.google.android.gms.games.PlayerL
     java.lang.String toString() -> toString
     int describeContents() -> describeContents
     void writeToParcel(android.os.Parcel,int) -> writeToParcel
-com.google.android.gms.games.PlayerLevelCreator -> com.google.android.gms.games.m:
+com.google.android.gms.games.PlayerLevelCreator -> com.google.android.gms.games.n:
     com.google.android.gms.games.PlayerLevel createFromParcel(android.os.Parcel) -> a
     com.google.android.gms.games.PlayerLevel[] newArray(int) -> a
     void a(com.google.android.gms.games.PlayerLevel,android.os.Parcel,int) -> a
@@ -5358,7 +5574,7 @@ com.google.android.gms.games.PlayerLevelInfo -> com.google.android.gms.games.Pla
     int hashCode() -> hashCode
     int describeContents() -> describeContents
     void writeToParcel(android.os.Parcel,int) -> writeToParcel
-com.google.android.gms.games.PlayerLevelInfoCreator -> com.google.android.gms.games.n:
+com.google.android.gms.games.PlayerLevelInfoCreator -> com.google.android.gms.games.o:
     com.google.android.gms.games.PlayerLevelInfo createFromParcel(android.os.Parcel) -> a
     com.google.android.gms.games.PlayerLevelInfo[] newArray(int) -> a
     void a(com.google.android.gms.games.PlayerLevelInfo,android.os.Parcel,int) -> a
@@ -5389,7 +5605,8 @@ com.google.android.gms.games.PlayerRef -> com.google.android.gms.games.PlayerRef
     void writeToParcel(android.os.Parcel,int) -> writeToParcel
     boolean kG() -> p
     java.lang.Object freeze() -> a
-com.google.android.gms.games.Players -> com.google.android.gms.games.o:
+com.google.android.gms.games.Players -> com.google.android.gms.games.p:
+    com.google.android.gms.games.Player getCurrentPlayer(com.google.android.gms.common.api.GoogleApiClient) -> a
 com.google.android.gms.games.achievement.Achievement -> com.google.android.gms.games.achievement.Achievement:
     java.lang.String getAchievementId() -> c_
     int getType() -> c
@@ -6009,27 +6226,87 @@ com.google.android.gms.games.internal.GamesClientImpl -> com.google.android.gms.
     java.lang.String bL() -> e
     com.google.android.gms.games.internal.IGamesService aC(android.os.IBinder) -> a
     android.os.Bundle fX() -> k_
-    void lg() -> l
+    void lg() -> n
     void a(com.google.android.gms.internal.jt,com.google.android.gms.internal.jl$e) -> a
+    com.google.android.gms.games.Player lj() -> f
+    android.content.Intent ln() -> g
+    void a(com.google.android.gms.common.api.d) -> a
+    void b(com.google.android.gms.common.api.d) -> b
     void b(com.google.android.gms.common.api.BaseImplementation$b) -> a
-    void lD() -> m
+    void q(java.lang.String,int) -> a
+    android.content.Intent a(int,int,boolean) -> a
+    void a(com.google.android.gms.common.api.BaseImplementation$b,com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig) -> a
+    void c(com.google.android.gms.common.api.BaseImplementation$b,java.lang.String) -> a
+    void d(com.google.android.gms.common.api.BaseImplementation$b,java.lang.String) -> b
+    void a(com.google.android.gms.common.api.BaseImplementation$b,java.lang.String,byte[],java.lang.String,com.google.android.gms.games.multiplayer.ParticipantResult[]) -> a
+    void a(com.google.android.gms.common.api.BaseImplementation$b,java.lang.String,byte[],com.google.android.gms.games.multiplayer.ParticipantResult[]) -> a
+    void a(com.google.android.gms.common.api.BaseImplementation$b,int,int[]) -> a
+    void lD() -> o
     void a(android.os.IBinder,android.os.Bundle) -> a
-    void lE() -> f
+    void lE() -> h
     void a(int,android.os.IBinder,android.os.Bundle) -> a
     android.os.IInterface l(android.os.IBinder) -> b
 com.google.android.gms.games.internal.GamesClientImpl$1 -> com.google.android.gms.games.internal.d:
     com.google.android.gms.games.internal.GamesClientImpl Yu -> a
-com.google.android.gms.games.internal.GamesClientImpl$SignOutCompleteBinderCallbacks -> com.google.android.gms.games.internal.e:
+com.google.android.gms.games.internal.GamesClientImpl$InitiateMatchResultImpl -> com.google.android.gms.games.internal.e:
+com.google.android.gms.games.internal.GamesClientImpl$InvitationReceivedBinderCallback -> com.google.android.gms.games.internal.f:
+    com.google.android.gms.common.api.d Qe -> a
+    void n(com.google.android.gms.common.data.DataHolder) -> l
+    void onInvitationRemoved(java.lang.String) -> a
+com.google.android.gms.games.internal.GamesClientImpl$InvitationReceivedNotifier -> com.google.android.gms.games.internal.g:
+    com.google.android.gms.games.multiplayer.Invitation YF -> a
+    void a(com.google.android.gms.games.multiplayer.OnInvitationReceivedListener) -> a
+    void gG() -> a
+    void c(java.lang.Object) -> a
+com.google.android.gms.games.internal.GamesClientImpl$InvitationRemovedNotifier -> com.google.android.gms.games.internal.h:
+    java.lang.String YG -> a
+    void a(com.google.android.gms.games.multiplayer.OnInvitationReceivedListener) -> a
+    void gG() -> a
+    void c(java.lang.Object) -> a
+com.google.android.gms.games.internal.GamesClientImpl$LoadMatchesResultImpl -> com.google.android.gms.games.internal.i:
+    com.google.android.gms.common.api.Status Eb -> a
+    com.google.android.gms.games.multiplayer.turnbased.LoadMatchesResponse YR -> b
+    com.google.android.gms.common.api.Status getStatus() -> b
+    com.google.android.gms.games.multiplayer.turnbased.LoadMatchesResponse getMatches() -> c
+    void release() -> a
+com.google.android.gms.games.internal.GamesClientImpl$MatchRemovedNotifier -> com.google.android.gms.games.internal.j:
+    java.lang.String Zb -> a
+    void a(com.google.android.gms.games.multiplayer.turnbased.OnTurnBasedMatchUpdateReceivedListener) -> a
+    void gG() -> a
+    void c(java.lang.Object) -> a
+com.google.android.gms.games.internal.GamesClientImpl$MatchUpdateReceivedBinderCallback -> com.google.android.gms.games.internal.k:
+    com.google.android.gms.common.api.d Qe -> a
+    void t(com.google.android.gms.common.data.DataHolder) -> r
+    void onTurnBasedMatchRemoved(java.lang.String) -> c
+com.google.android.gms.games.internal.GamesClientImpl$MatchUpdateReceivedNotifier -> com.google.android.gms.games.internal.l:
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch Zc -> a
+    void a(com.google.android.gms.games.multiplayer.turnbased.OnTurnBasedMatchUpdateReceivedListener) -> a
+    void gG() -> a
+    void c(java.lang.Object) -> a
+com.google.android.gms.games.internal.GamesClientImpl$SignOutCompleteBinderCallbacks -> com.google.android.gms.games.internal.m:
     com.google.android.gms.common.api.BaseImplementation$b Ea -> a
     void fK() -> a
+com.google.android.gms.games.internal.GamesClientImpl$TurnBasedMatchInitiatedBinderCallbacks -> com.google.android.gms.games.internal.n:
+    com.google.android.gms.common.api.BaseImplementation$b ZG -> a
+    void q(com.google.android.gms.common.data.DataHolder) -> o
+com.google.android.gms.games.internal.GamesClientImpl$TurnBasedMatchResult -> com.google.android.gms.games.internal.o:
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch Zc -> c
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch getMatch() -> c
+com.google.android.gms.games.internal.GamesClientImpl$TurnBasedMatchUpdatedBinderCallbacks -> com.google.android.gms.games.internal.p:
+    com.google.android.gms.common.api.BaseImplementation$b ZJ -> a
+    void r(com.google.android.gms.common.data.DataHolder) -> p
+com.google.android.gms.games.internal.GamesClientImpl$TurnBasedMatchesLoadedBinderCallbacks -> com.google.android.gms.games.internal.q:
+    com.google.android.gms.common.api.BaseImplementation$b ZK -> a
+    void b(int,android.os.Bundle) -> a
+com.google.android.gms.games.internal.GamesClientImpl$UpdateMatchResultImpl -> com.google.android.gms.games.internal.r:
 com.google.android.gms.games.internal.GamesDowngradeableSafeParcel -> com.google.android.gms.games.internal.GamesDowngradeableSafeParcel:
     boolean c(java.lang.Integer) -> b
-com.google.android.gms.games.internal.GamesLog -> com.google.android.gms.games.internal.f:
+com.google.android.gms.games.internal.GamesLog -> com.google.android.gms.games.internal.s:
     com.google.android.gms.internal.jp Qp -> a
     void o(java.lang.String,java.lang.String) -> a
     void p(java.lang.String,java.lang.String) -> b
     void c(java.lang.String,java.lang.String,java.lang.Throwable) -> a
-com.google.android.gms.games.internal.IGamesCallbacks -> com.google.android.gms.games.internal.g:
+com.google.android.gms.games.internal.IGamesCallbacks -> com.google.android.gms.games.internal.t:
     void f(int,java.lang.String) -> a
     void c(com.google.android.gms.common.data.DataHolder) -> a
     void g(int,java.lang.String) -> b
@@ -6103,11 +6380,11 @@ com.google.android.gms.games.internal.IGamesCallbacks -> com.google.android.gms.
     void Q(com.google.android.gms.common.data.DataHolder) -> O
     void dQ(int) -> c
     void a(com.google.android.gms.common.data.DataHolder[]) -> a
-com.google.android.gms.games.internal.IGamesCallbacks$Stub -> com.google.android.gms.games.internal.h:
+com.google.android.gms.games.internal.IGamesCallbacks$Stub -> com.google.android.gms.games.internal.u:
     com.google.android.gms.games.internal.IGamesCallbacks aD(android.os.IBinder) -> a
     android.os.IBinder asBinder() -> asBinder
     boolean onTransact(int,android.os.Parcel,android.os.Parcel,int) -> onTransact
-com.google.android.gms.games.internal.IGamesCallbacks$Stub$Proxy -> com.google.android.gms.games.internal.i:
+com.google.android.gms.games.internal.IGamesCallbacks$Stub$Proxy -> com.google.android.gms.games.internal.v:
     android.os.IBinder le -> a
     android.os.IBinder asBinder() -> asBinder
     void f(int,java.lang.String) -> a
@@ -6183,7 +6460,7 @@ com.google.android.gms.games.internal.IGamesCallbacks$Stub$Proxy -> com.google.a
     void Q(com.google.android.gms.common.data.DataHolder) -> O
     void dQ(int) -> c
     void a(com.google.android.gms.common.data.DataHolder[]) -> a
-com.google.android.gms.games.internal.IGamesService -> com.google.android.gms.games.internal.j:
+com.google.android.gms.games.internal.IGamesService -> com.google.android.gms.games.internal.w:
     void q(long) -> a
     void a(com.google.android.gms.games.internal.IGamesCallbacks) -> a
     java.lang.String lw() -> a
@@ -6378,10 +6655,10 @@ com.google.android.gms.games.internal.IGamesService -> com.google.android.gms.ga
     android.content.Intent u(java.lang.String,int) -> f
     void a(com.google.android.gms.games.internal.IGamesCallbacks,int,java.lang.String,java.lang.String[],boolean) -> a
     android.content.Intent a(com.google.android.gms.games.multiplayer.ParticipantEntity[],java.lang.String,java.lang.String,android.net.Uri,android.net.Uri,java.lang.String) -> a
-com.google.android.gms.games.internal.IGamesService$Stub -> com.google.android.gms.games.internal.k:
+com.google.android.gms.games.internal.IGamesService$Stub -> com.google.android.gms.games.internal.x:
     com.google.android.gms.games.internal.IGamesService aE(android.os.IBinder) -> a
     boolean onTransact(int,android.os.Parcel,android.os.Parcel,int) -> onTransact
-com.google.android.gms.games.internal.IGamesService$Stub$Proxy -> com.google.android.gms.games.internal.l:
+com.google.android.gms.games.internal.IGamesService$Stub$Proxy -> com.google.android.gms.games.internal.y:
     android.os.IBinder le -> a
     android.os.IBinder asBinder() -> asBinder
     void q(long) -> a
@@ -6578,7 +6855,7 @@ com.google.android.gms.games.internal.IGamesService$Stub$Proxy -> com.google.and
     android.content.Intent u(java.lang.String,int) -> f
     void a(com.google.android.gms.games.internal.IGamesCallbacks,int,java.lang.String,java.lang.String[],boolean) -> a
     android.content.Intent a(com.google.android.gms.games.multiplayer.ParticipantEntity[],java.lang.String,java.lang.String,android.net.Uri,android.net.Uri,java.lang.String) -> a
-com.google.android.gms.games.internal.PopupManager -> com.google.android.gms.games.internal.m:
+com.google.android.gms.games.internal.PopupManager -> com.google.android.gms.games.internal.z:
     com.google.android.gms.games.internal.GamesClientImpl ZQ -> a
     com.google.android.gms.games.internal.PopupManager$PopupLocationInfo ZR -> b
     com.google.android.gms.games.internal.PopupManager a(com.google.android.gms.games.internal.GamesClientImpl,int) -> a
@@ -6586,8 +6863,8 @@ com.google.android.gms.games.internal.PopupManager -> com.google.android.gms.gam
     void l(android.view.View) -> a
     void lT() -> a
     android.os.IBinder lV() -> b
-com.google.android.gms.games.internal.PopupManager$1 -> com.google.android.gms.games.internal.n:
-com.google.android.gms.games.internal.PopupManager$PopupLocationInfo -> com.google.android.gms.games.internal.o:
+com.google.android.gms.games.internal.PopupManager$1 -> com.google.android.gms.games.internal.aa:
+com.google.android.gms.games.internal.PopupManager$PopupLocationInfo -> com.google.android.gms.games.internal.ab:
     android.os.IBinder ZS -> a
     int gravity -> b
     int ZT -> c
@@ -6596,7 +6873,7 @@ com.google.android.gms.games.internal.PopupManager$PopupLocationInfo -> com.goog
     int right -> f
     int bottom -> g
     android.os.Bundle lW() -> a
-com.google.android.gms.games.internal.PopupManager$PopupManagerHCMR1 -> com.google.android.gms.games.internal.p:
+com.google.android.gms.games.internal.PopupManager$PopupManagerHCMR1 -> com.google.android.gms.games.internal.ac:
     java.lang.ref.WeakReference ZU -> c
     boolean Yq -> d
     void dY(int) -> a
@@ -6612,17 +6889,94 @@ com.google.android.gms.games.internal.api.AppContentsImpl -> com.google.android.
 com.google.android.gms.games.internal.api.EventsImpl -> com.google.android.gms.games.internal.a.d:
 com.google.android.gms.games.internal.api.GamesMetadataImpl -> com.google.android.gms.games.internal.a.e:
 com.google.android.gms.games.internal.api.InvitationsImpl -> com.google.android.gms.games.internal.a.f:
+    void registerInvitationListener(com.google.android.gms.common.api.GoogleApiClient,com.google.android.gms.games.multiplayer.OnInvitationReceivedListener) -> a
 com.google.android.gms.games.internal.api.LeaderboardsImpl -> com.google.android.gms.games.internal.a.g:
 com.google.android.gms.games.internal.api.MultiplayerImpl -> com.google.android.gms.games.internal.a.h:
 com.google.android.gms.games.internal.api.NotificationsImpl -> com.google.android.gms.games.internal.a.i:
 com.google.android.gms.games.internal.api.PlayersImpl -> com.google.android.gms.games.internal.a.j:
+    com.google.android.gms.games.Player getCurrentPlayer(com.google.android.gms.common.api.GoogleApiClient) -> a
 com.google.android.gms.games.internal.api.QuestsImpl -> com.google.android.gms.games.internal.a.k:
 com.google.android.gms.games.internal.api.RealTimeMultiplayerImpl -> com.google.android.gms.games.internal.a.l:
 com.google.android.gms.games.internal.api.RequestsImpl -> com.google.android.gms.games.internal.a.m:
 com.google.android.gms.games.internal.api.SnapshotsImpl -> com.google.android.gms.games.internal.a.n:
 com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl -> com.google.android.gms.games.internal.a.o:
+    android.content.Intent getInboxIntent(com.google.android.gms.common.api.GoogleApiClient) -> a
+    void registerMatchUpdateListener(com.google.android.gms.common.api.GoogleApiClient,com.google.android.gms.games.multiplayer.turnbased.OnTurnBasedMatchUpdateReceivedListener) -> a
+    android.content.Intent getSelectOpponentsIntent(com.google.android.gms.common.api.GoogleApiClient,int,int,boolean) -> a
+    com.google.android.gms.common.api.PendingResult createMatch(com.google.android.gms.common.api.GoogleApiClient,com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig) -> a
+    com.google.android.gms.common.api.PendingResult rematch(com.google.android.gms.common.api.GoogleApiClient,java.lang.String) -> a
+    com.google.android.gms.common.api.PendingResult acceptInvitation(com.google.android.gms.common.api.GoogleApiClient,java.lang.String) -> b
+    void declineInvitation(com.google.android.gms.common.api.GoogleApiClient,java.lang.String) -> c
+    com.google.android.gms.common.api.PendingResult takeTurn(com.google.android.gms.common.api.GoogleApiClient,java.lang.String,byte[],java.lang.String) -> a
+    com.google.android.gms.common.api.PendingResult takeTurn(com.google.android.gms.common.api.GoogleApiClient,java.lang.String,byte[],java.lang.String,com.google.android.gms.games.multiplayer.ParticipantResult[]) -> a
+    com.google.android.gms.common.api.PendingResult finishMatch(com.google.android.gms.common.api.GoogleApiClient,java.lang.String,byte[],com.google.android.gms.games.multiplayer.ParticipantResult[]) -> a
+    com.google.android.gms.common.api.PendingResult finishMatch(com.google.android.gms.common.api.GoogleApiClient,java.lang.String,byte[],java.util.List) -> a
+    com.google.android.gms.common.api.PendingResult loadMatchesByStatus(com.google.android.gms.common.api.GoogleApiClient,int[]) -> a
+    com.google.android.gms.common.api.PendingResult loadMatchesByStatus(com.google.android.gms.common.api.GoogleApiClient,int,int[]) -> a
+com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$1 -> com.google.android.gms.games.internal.a.p:
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig abS -> b
+    com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl abT -> c
+    void a(com.google.android.gms.games.internal.GamesClientImpl) -> a
+    void a(com.google.android.gms.common.api.Api$a) -> b
+com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$2 -> com.google.android.gms.games.internal.a.q:
+    java.lang.String abU -> b
+    com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl abT -> c
+    void a(com.google.android.gms.games.internal.GamesClientImpl) -> a
+    void a(com.google.android.gms.common.api.Api$a) -> b
+com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$3 -> com.google.android.gms.games.internal.a.r:
+    java.lang.String aaC -> b
+    com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl abT -> c
+    void a(com.google.android.gms.games.internal.GamesClientImpl) -> a
+    void a(com.google.android.gms.common.api.Api$a) -> b
+com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$4 -> com.google.android.gms.games.internal.a.s:
+    java.lang.String abU -> b
+    byte[] abX -> c
+    java.lang.String abY -> d
+    com.google.android.gms.games.multiplayer.ParticipantResult[] abZ -> e
+    com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl abT -> f
+    void a(com.google.android.gms.games.internal.GamesClientImpl) -> a
+    void a(com.google.android.gms.common.api.Api$a) -> b
+com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$5 -> com.google.android.gms.games.internal.a.t:
+    java.lang.String abU -> b
+    byte[] abX -> c
+    com.google.android.gms.games.multiplayer.ParticipantResult[] abZ -> d
+    com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl abT -> e
+    void a(com.google.android.gms.games.internal.GamesClientImpl) -> a
+    void a(com.google.android.gms.common.api.Api$a) -> b
+com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$9 -> com.google.android.gms.games.internal.a.u:
+    int abV -> b
+    int[] abW -> c
+    com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl abT -> d
+    void a(com.google.android.gms.games.internal.GamesClientImpl) -> a
+    void a(com.google.android.gms.common.api.Api$a) -> b
+com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$InitiateMatchImpl -> com.google.android.gms.games.internal.a.v:
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$InitiateMatchResult at(com.google.android.gms.common.api.Status) -> c
+    com.google.android.gms.common.api.Result c(com.google.android.gms.common.api.Status) -> a
+com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$InitiateMatchImpl$1 -> com.google.android.gms.games.internal.a.w:
+    com.google.android.gms.common.api.Status DS -> a
+    com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$InitiateMatchImpl acb -> b
+    com.google.android.gms.common.api.Status getStatus() -> b
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch getMatch() -> c
+com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$LoadMatchesImpl -> com.google.android.gms.games.internal.a.x:
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$LoadMatchesResult aw(com.google.android.gms.common.api.Status) -> c
+    com.google.android.gms.common.api.Result c(com.google.android.gms.common.api.Status) -> a
+com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$LoadMatchesImpl$1 -> com.google.android.gms.games.internal.a.y:
+    com.google.android.gms.common.api.Status DS -> a
+    com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$LoadMatchesImpl ace -> b
+    com.google.android.gms.common.api.Status getStatus() -> b
+    void release() -> a
+    com.google.android.gms.games.multiplayer.turnbased.LoadMatchesResponse getMatches() -> c
+com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$UpdateMatchImpl -> com.google.android.gms.games.internal.a.z:
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$UpdateMatchResult ax(com.google.android.gms.common.api.Status) -> c
+    com.google.android.gms.common.api.Result c(com.google.android.gms.common.api.Status) -> a
+com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$UpdateMatchImpl$1 -> com.google.android.gms.games.internal.a.aa:
+    com.google.android.gms.common.api.Status DS -> a
+    com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$UpdateMatchImpl acf -> b
+    com.google.android.gms.common.api.Status getStatus() -> b
 com.google.android.gms.games.internal.constants.MatchResult -> com.google.android.gms.games.internal.b.a:
     boolean isValid(int) -> a
+com.google.android.gms.games.internal.constants.TurnBasedMatchTurnStatus -> com.google.android.gms.games.internal.b.b:
+    java.lang.String dZ(int) -> a
 com.google.android.gms.games.internal.events.EventIncrementCache -> com.google.android.gms.games.internal.c.a:
     java.lang.Object ack -> a
     java.util.HashMap acn -> b
@@ -6888,7 +7242,7 @@ com.google.android.gms.games.internal.request.GameRequestCluster -> com.google.a
     int getType() -> i
     long getCreationTimestamp() -> j
     long getExpirationTimestamp() -> k
-    int getRecipientStatus(java.lang.String) -> a_
+    int getRecipientStatus(java.lang.String) -> b_
     int getStatus() -> l
     com.google.android.gms.games.request.GameRequest freeze() -> m
     boolean equals(java.lang.Object) -> equals
@@ -6912,6 +7266,10 @@ com.google.android.gms.games.multiplayer.Invitation -> com.google.android.gms.ga
     int getInvitationType() -> h
     int getVariant() -> i
     int getAvailableAutoMatchSlots() -> j
+com.google.android.gms.games.multiplayer.InvitationBuffer -> com.google.android.gms.games.multiplayer.a:
+    java.lang.String ha() -> c
+    com.google.android.gms.games.multiplayer.Invitation k(int,int) -> b
+    java.lang.Object f(int,int) -> a
 com.google.android.gms.games.multiplayer.InvitationEntity -> com.google.android.gms.games.multiplayer.InvitationEntity:
     android.os.Parcelable$Creator CREATOR -> CREATOR
     int CK -> a
@@ -6945,10 +7303,10 @@ com.google.android.gms.games.multiplayer.InvitationEntity -> com.google.android.
     java.lang.Integer kD() -> k
     boolean b(java.lang.Integer) -> a
     boolean bz(java.lang.String) -> a
-com.google.android.gms.games.multiplayer.InvitationEntity$InvitationEntityCreatorCompat -> com.google.android.gms.games.multiplayer.a:
+com.google.android.gms.games.multiplayer.InvitationEntity$InvitationEntityCreatorCompat -> com.google.android.gms.games.multiplayer.b:
     com.google.android.gms.games.multiplayer.InvitationEntity cz(android.os.Parcel) -> a
     java.lang.Object createFromParcel(android.os.Parcel) -> createFromParcel
-com.google.android.gms.games.multiplayer.InvitationEntityCreator -> com.google.android.gms.games.multiplayer.b:
+com.google.android.gms.games.multiplayer.InvitationEntityCreator -> com.google.android.gms.games.multiplayer.c:
     com.google.android.gms.games.multiplayer.InvitationEntity cz(android.os.Parcel) -> a
     com.google.android.gms.games.multiplayer.InvitationEntity[] el(int) -> a
     void a(com.google.android.gms.games.multiplayer.InvitationEntity,android.os.Parcel,int) -> a
@@ -6973,8 +7331,12 @@ com.google.android.gms.games.multiplayer.InvitationRef -> com.google.android.gms
     int describeContents() -> describeContents
     void writeToParcel(android.os.Parcel,int) -> writeToParcel
     java.lang.Object freeze() -> a
-com.google.android.gms.games.multiplayer.Invitations -> com.google.android.gms.games.multiplayer.c:
-com.google.android.gms.games.multiplayer.Multiplayer -> com.google.android.gms.games.multiplayer.d:
+com.google.android.gms.games.multiplayer.Invitations -> com.google.android.gms.games.multiplayer.d:
+    void registerInvitationListener(com.google.android.gms.common.api.GoogleApiClient,com.google.android.gms.games.multiplayer.OnInvitationReceivedListener) -> a
+com.google.android.gms.games.multiplayer.Multiplayer -> com.google.android.gms.games.multiplayer.e:
+com.google.android.gms.games.multiplayer.OnInvitationReceivedListener -> com.google.android.gms.games.multiplayer.f:
+    void onInvitationReceived(com.google.android.gms.games.multiplayer.Invitation) -> a
+    void onInvitationRemoved(java.lang.String) -> b
 com.google.android.gms.games.multiplayer.Participant -> com.google.android.gms.games.multiplayer.Participant:
     int getStatus() -> p_
     java.lang.String le() -> c
@@ -7029,10 +7391,10 @@ com.google.android.gms.games.multiplayer.ParticipantEntity -> com.google.android
     java.lang.Integer kD() -> p
     boolean b(java.lang.Integer) -> a
     boolean bz(java.lang.String) -> a
-com.google.android.gms.games.multiplayer.ParticipantEntity$ParticipantEntityCreatorCompat -> com.google.android.gms.games.multiplayer.e:
+com.google.android.gms.games.multiplayer.ParticipantEntity$ParticipantEntityCreatorCompat -> com.google.android.gms.games.multiplayer.g:
     com.google.android.gms.games.multiplayer.ParticipantEntity cA(android.os.Parcel) -> a
     java.lang.Object createFromParcel(android.os.Parcel) -> createFromParcel
-com.google.android.gms.games.multiplayer.ParticipantEntityCreator -> com.google.android.gms.games.multiplayer.f:
+com.google.android.gms.games.multiplayer.ParticipantEntityCreator -> com.google.android.gms.games.multiplayer.h:
     com.google.android.gms.games.multiplayer.ParticipantEntity cA(android.os.Parcel) -> a
     com.google.android.gms.games.multiplayer.ParticipantEntity[] em(int) -> a
     void a(com.google.android.gms.games.multiplayer.ParticipantEntity,android.os.Parcel,int) -> a
@@ -7071,13 +7433,13 @@ com.google.android.gms.games.multiplayer.ParticipantResult -> com.google.android
     int getPlacing() -> d
     int describeContents() -> describeContents
     void writeToParcel(android.os.Parcel,int) -> writeToParcel
-com.google.android.gms.games.multiplayer.ParticipantResultCreator -> com.google.android.gms.games.multiplayer.g:
+com.google.android.gms.games.multiplayer.ParticipantResultCreator -> com.google.android.gms.games.multiplayer.i:
     com.google.android.gms.games.multiplayer.ParticipantResult createFromParcel(android.os.Parcel) -> a
     com.google.android.gms.games.multiplayer.ParticipantResult[] newArray(int) -> a
     void a(com.google.android.gms.games.multiplayer.ParticipantResult,android.os.Parcel,int) -> a
     java.lang.Object[] newArray(int) -> newArray
     java.lang.Object createFromParcel(android.os.Parcel) -> createFromParcel
-com.google.android.gms.games.multiplayer.Participatable -> com.google.android.gms.games.multiplayer.h:
+com.google.android.gms.games.multiplayer.Participatable -> com.google.android.gms.games.multiplayer.j:
     java.util.ArrayList getParticipants() -> l
 com.google.android.gms.games.multiplayer.realtime.RealTimeMessage -> com.google.android.gms.games.multiplayer.realtime.RealTimeMessage:
     java.lang.String aee -> a
@@ -7167,6 +7529,20 @@ com.google.android.gms.games.multiplayer.realtime.RoomRef -> com.google.android.
     int describeContents() -> describeContents
     void writeToParcel(android.os.Parcel,int) -> writeToParcel
     java.lang.Object freeze() -> a
+com.google.android.gms.games.multiplayer.turnbased.LoadMatchesResponse -> com.google.android.gms.games.multiplayer.turnbased.a:
+    com.google.android.gms.games.multiplayer.InvitationBuffer aes -> a
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchBuffer aet -> b
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchBuffer aeu -> c
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchBuffer aev -> d
+    com.google.android.gms.common.data.DataHolder a(android.os.Bundle,int) -> a
+    com.google.android.gms.games.multiplayer.InvitationBuffer getInvitations() -> a
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchBuffer getMyTurnMatches() -> b
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchBuffer getTheirTurnMatches() -> c
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchBuffer getCompletedMatches() -> d
+    void release() -> e
+com.google.android.gms.games.multiplayer.turnbased.OnTurnBasedMatchUpdateReceivedListener -> com.google.android.gms.games.multiplayer.turnbased.b:
+    void onTurnBasedMatchReceived(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch) -> a
+    void onTurnBasedMatchRemoved(java.lang.String) -> a
 com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch -> com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch:
     int[] MATCH_TURN_STATUS_ALL -> a_
     com.google.android.gms.games.Game getGame() -> r_
@@ -7188,9 +7564,37 @@ com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch -> com.google.
     android.os.Bundle getAutoMatchCriteria() -> s
     int getAvailableAutoMatchSlots() -> t
     boolean isLocallyModified() -> u
+    java.lang.String getParticipantId(java.lang.String) -> a_
     java.lang.String getDescriptionParticipantId() -> v
-com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig -> com.google.android.gms.games.multiplayer.turnbased.a:
+com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchBuffer -> com.google.android.gms.games.multiplayer.turnbased.c:
+    java.lang.String ha() -> c
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch m(int,int) -> b
+    java.lang.Object f(int,int) -> a
+com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig -> com.google.android.gms.games.multiplayer.turnbased.d:
+    int getVariant() -> a
+    int mO() -> b
+    java.lang.String[] getInvitedPlayerIds() -> c
+    android.os.Bundle getAutoMatchCriteria() -> d
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig$Builder builder() -> e
     android.os.Bundle createAutoMatchCriteria(int,int,long) -> a
+com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig$1 -> com.google.android.gms.games.multiplayer.turnbased.e:
+com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig$Builder -> com.google.android.gms.games.multiplayer.turnbased.f:
+    int adW -> a
+    java.util.ArrayList ael -> b
+    android.os.Bundle aem -> c
+    int aew -> d
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig$Builder addInvitedPlayers(java.util.ArrayList) -> a
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig$Builder setAutoMatchCriteria(android.os.Bundle) -> a
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig build() -> a
+com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfigImpl -> com.google.android.gms.games.multiplayer.turnbased.g:
+    int adW -> a
+    java.lang.String[] aeo -> b
+    android.os.Bundle aem -> c
+    int aew -> d
+    int getVariant() -> a
+    int mO() -> b
+    java.lang.String[] getInvitedPlayerIds() -> c
+    android.os.Bundle getAutoMatchCriteria() -> d
 com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchEntity -> com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchEntity:
     com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchEntityCreator CREATOR -> CREATOR
     int CK -> b
@@ -7235,6 +7639,7 @@ com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchEntity -> com.g
     android.os.Bundle getAutoMatchCriteria() -> s
     int getAvailableAutoMatchSlots() -> t
     boolean isLocallyModified() -> u
+    java.lang.String getParticipantId(java.lang.String) -> a_
     java.util.ArrayList getParticipants() -> l
     com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch freeze() -> x
     int hashCode() -> hashCode
@@ -7245,8 +7650,9 @@ com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchEntity -> com.g
     java.lang.String b(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch) -> b
     int describeContents() -> describeContents
     void writeToParcel(android.os.Parcel,int) -> writeToParcel
+    java.lang.String b(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch,java.lang.String) -> a
     java.lang.Object freeze() -> a
-com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchEntityCreator -> com.google.android.gms.games.multiplayer.turnbased.b:
+com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchEntityCreator -> com.google.android.gms.games.multiplayer.turnbased.h:
     com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchEntity createFromParcel(android.os.Parcel) -> a
     com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchEntity[] newArray(int) -> a
     void a(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchEntity,android.os.Parcel,int) -> a
@@ -7276,6 +7682,7 @@ com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchRef -> com.goog
     android.os.Bundle getAutoMatchCriteria() -> s
     int getAvailableAutoMatchSlots() -> t
     boolean isLocallyModified() -> u
+    java.lang.String getParticipantId(java.lang.String) -> a_
     com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch freeze() -> w
     int hashCode() -> hashCode
     boolean equals(java.lang.Object) -> equals
@@ -7283,7 +7690,22 @@ com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchRef -> com.goog
     int describeContents() -> describeContents
     void writeToParcel(android.os.Parcel,int) -> writeToParcel
     java.lang.Object freeze() -> a
-com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer -> com.google.android.gms.games.multiplayer.turnbased.c:
+com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer -> com.google.android.gms.games.multiplayer.turnbased.i:
+    android.content.Intent getInboxIntent(com.google.android.gms.common.api.GoogleApiClient) -> a
+    void registerMatchUpdateListener(com.google.android.gms.common.api.GoogleApiClient,com.google.android.gms.games.multiplayer.turnbased.OnTurnBasedMatchUpdateReceivedListener) -> a
+    android.content.Intent getSelectOpponentsIntent(com.google.android.gms.common.api.GoogleApiClient,int,int,boolean) -> a
+    com.google.android.gms.common.api.PendingResult createMatch(com.google.android.gms.common.api.GoogleApiClient,com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig) -> a
+    com.google.android.gms.common.api.PendingResult rematch(com.google.android.gms.common.api.GoogleApiClient,java.lang.String) -> a
+    com.google.android.gms.common.api.PendingResult acceptInvitation(com.google.android.gms.common.api.GoogleApiClient,java.lang.String) -> b
+    void declineInvitation(com.google.android.gms.common.api.GoogleApiClient,java.lang.String) -> c
+    com.google.android.gms.common.api.PendingResult takeTurn(com.google.android.gms.common.api.GoogleApiClient,java.lang.String,byte[],java.lang.String) -> a
+    com.google.android.gms.common.api.PendingResult finishMatch(com.google.android.gms.common.api.GoogleApiClient,java.lang.String,byte[],java.util.List) -> a
+    com.google.android.gms.common.api.PendingResult loadMatchesByStatus(com.google.android.gms.common.api.GoogleApiClient,int[]) -> a
+com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$InitiateMatchResult -> com.google.android.gms.games.multiplayer.turnbased.j:
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch getMatch() -> c
+com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$LoadMatchesResult -> com.google.android.gms.games.multiplayer.turnbased.k:
+    com.google.android.gms.games.multiplayer.turnbased.LoadMatchesResponse getMatches() -> c
+com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$UpdateMatchResult -> com.google.android.gms.games.multiplayer.turnbased.l:
 com.google.android.gms.games.quest.Milestone -> com.google.android.gms.games.quest.Milestone:
     java.lang.String getMilestoneId() -> s_
     long getCurrentProgress() -> c
@@ -7446,7 +7868,7 @@ com.google.android.gms.games.request.GameRequest -> com.google.android.gms.games
     int getType() -> i
     long getCreationTimestamp() -> j
     long getExpirationTimestamp() -> k
-    int getRecipientStatus(java.lang.String) -> a_
+    int getRecipientStatus(java.lang.String) -> b_
     int getStatus() -> l
 com.google.android.gms.games.request.GameRequestEntity -> com.google.android.gms.games.request.GameRequestEntity:
     com.google.android.gms.games.request.GameRequestEntityCreator CREATOR -> CREATOR
@@ -7470,7 +7892,7 @@ com.google.android.gms.games.request.GameRequestEntity -> com.google.android.gms
     int getType() -> i
     long getCreationTimestamp() -> j
     long getExpirationTimestamp() -> k
-    int getRecipientStatus(java.lang.String) -> a_
+    int getRecipientStatus(java.lang.String) -> b_
     int getStatus() -> l
     android.os.Bundle mS() -> c
     com.google.android.gms.games.request.GameRequest freeze() -> g
@@ -7500,7 +7922,7 @@ com.google.android.gms.games.request.GameRequestRef -> com.google.android.gms.ga
     int getType() -> i
     long getCreationTimestamp() -> j
     long getExpirationTimestamp() -> k
-    int getRecipientStatus(java.lang.String) -> a_
+    int getRecipientStatus(java.lang.String) -> b_
     int getStatus() -> l
     com.google.android.gms.games.request.GameRequest freeze() -> c
     int hashCode() -> hashCode
@@ -10553,7 +10975,7 @@ com.google.android.gms.internal.hl$b -> com.google.android.gms.internal.hl$b:
     java.util.List De -> b
     com.google.android.gms.internal.hn CREATOR -> CREATOR
     int CK -> c
-    com.google.android.gms.common.api.Status getStatus() -> a
+    com.google.android.gms.common.api.Status getStatus() -> b
     int describeContents() -> describeContents
     void writeToParcel(android.os.Parcel,int) -> writeToParcel
 com.google.android.gms.internal.hm -> com.google.android.gms.internal.na:
@@ -10854,17 +11276,17 @@ com.google.android.gms.internal.jl -> com.google.android.gms.internal.op:
     boolean a(int,int,android.os.IInterface) -> a
     void connect() -> a
     boolean isConnected() -> c
-    boolean isConnecting() -> g
+    boolean isConnecting() -> i
     void disconnect() -> b
     void aD(int) -> b
-    android.content.Context getContext() -> h
-    java.lang.String[] hv() -> i
+    android.content.Context getContext() -> j
+    java.lang.String[] hv() -> k
     void N(android.os.IBinder) -> c
     void a(com.google.android.gms.internal.jt,com.google.android.gms.internal.jl$e) -> a
     void a(int,android.os.IBinder,android.os.Bundle) -> a
-    void dS() -> j
+    void dS() -> l
     android.os.Bundle fX() -> k_
-    android.os.IInterface hw() -> k
+    android.os.IInterface hw() -> m
     boolean gN() -> l_
     void registerConnectionCallbacks(com.google.android.gms.common.api.GoogleApiClient$ConnectionCallbacks) -> a
     void registerConnectionFailedListener(com.google.android.gms.common.api.GoogleApiClient$OnConnectionFailedListener) -> a
@@ -12012,8 +12434,6 @@ com.google.android.gms.internal.ow -> com.google.android.gms.internal.td:
     java.lang.Object[] newArray(int) -> newArray
     java.lang.Object createFromParcel(android.os.Parcel) -> createFromParcel
 com.google.android.gms.internal.oy -> com.google.android.gms.internal.te:
-    java.lang.String getAccountName(com.google.android.gms.common.api.GoogleApiClient) -> a
-    com.google.android.gms.plus.internal.e a(com.google.android.gms.common.api.GoogleApiClient,com.google.android.gms.common.api.Api$c) -> a
 com.google.android.gms.internal.oz -> com.google.android.gms.internal.tf:
 com.google.android.gms.internal.p -> com.google.android.gms.internal.tg:
     com.google.android.gms.internal.qp lb -> a
@@ -13357,7 +13777,6 @@ com.google.android.gms.maps.model.y -> com.google.android.gms.maps.model.ac:
 com.google.android.gms.maps.model.z -> com.google.android.gms.maps.model.ad:
     void a(com.google.android.gms.maps.model.VisibleRegion,android.os.Parcel,int) -> a
 com.google.android.gms.plus.Account -> com.google.android.gms.plus.a:
-    java.lang.String getAccountName(com.google.android.gms.common.api.GoogleApiClient) -> a
 com.google.android.gms.plus.Moments -> com.google.android.gms.plus.b:
 com.google.android.gms.plus.People -> com.google.android.gms.plus.c:
 com.google.android.gms.plus.Plus -> com.google.android.gms.plus.d:
@@ -13475,7 +13894,6 @@ com.google.android.gms.plus.internal.d$a$a -> com.google.android.gms.plus.intern
 com.google.android.gms.plus.internal.e -> com.google.android.gms.plus.internal.g:
     com.google.android.gms.plus.model.people.Person anG -> a
     com.google.android.gms.plus.internal.h anH -> e
-    java.lang.String getAccountName() -> f
     com.google.android.gms.plus.internal.d bN(android.os.IBinder) -> a
     java.lang.String bL() -> e
     java.lang.String bK() -> d

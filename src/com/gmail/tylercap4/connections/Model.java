@@ -6,8 +6,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.widget.Toast;
+
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.games.Games;
 import com.google.android.gms.games.multiplayer.Participant;
+import com.google.android.gms.games.multiplayer.ParticipantResult;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer.UpdateMatchResult;
 
 public class Model 
 {
@@ -53,12 +63,13 @@ public class Model
 	}
 	
 	private void loadFromMatch(){
-		//TODO: load the pertinent data from the byte array
+		// load the pertinent data from the byte array
 		byte[] data = this.match.getData();
 		
 		try
         {
 			String decoded = new String(data, "UTF-8");
+//			Log.e("Decoded", decoded);
 			
 			int start = decoded.indexOf('[');
 			int end = decoded.indexOf(']', start) + 1;
@@ -95,7 +106,7 @@ public class Model
 	}
 	
 	public byte[] storeToData(){
-		//TODO: store all pertinent data properly to a byte array
+		// store all pertinent data properly to a byte array
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(getGameboardString());
 		buffer.append(getOwnersString());
@@ -212,7 +223,8 @@ public class Model
 	}
 	
 	private String getGameboardString(){
-		StringBuffer buffer = new StringBuffer('[');
+		StringBuffer buffer = new StringBuffer();
+		buffer.append('[');
 		for( int i=0; i<ROWS; i++ ){
 	        for( int j=0; j<COLUMNS; j++ ){
 	            int value = this.gameboard[i][j];
@@ -231,7 +243,8 @@ public class Model
 	}
 	
 	private String getOwnersString(){
-		StringBuffer buffer = new StringBuffer('[');
+		StringBuffer buffer = new StringBuffer();
+		buffer.append('[');
 		for( int i=0; i<ROWS; i++ ){
 	        for( int j=0; j<COLUMNS; j++ ){
 	            int value = this.owner_vals[i][j];
@@ -250,7 +263,8 @@ public class Model
 	}
 	
 	private String getP1CardsString(){
-		StringBuffer buffer = new StringBuffer('[');
+		StringBuffer buffer = new StringBuffer();
+		buffer.append('[');
 		for( int i=0; i<PLAYER_CARDS; i++ ){   
 			int value = this.owner1_cards[i];
 	        buffer.append(value);
@@ -265,7 +279,8 @@ public class Model
 	}
 	
 	private String getP2CardsString(){
-		StringBuffer buffer = new StringBuffer('[');
+		StringBuffer buffer = new StringBuffer();
+		buffer.append('[');
 		for( int i=0; i<PLAYER_CARDS; i++ ){   
 			int value = this.owner2_cards[i];
 	        buffer.append(value);
@@ -280,7 +295,8 @@ public class Model
 	}
 	
 	private String getDeckString(){
-		StringBuffer buffer = new StringBuffer('[');
+		StringBuffer buffer = new StringBuffer();
+		buffer.append('[');
 		int i = 1;
 		for( Integer value:this.deck ){   
 	        buffer.append(value);
@@ -305,11 +321,15 @@ public class Model
     	synchronized( this ){	    	
     		List<Integer> vals = new LinkedList<Integer>();
     		deck = new LinkedList<Integer>();
-	    	for( int val = 0; val <= (ROWS * COLUMNS / 2); val++ ){
+	    	for( int val = 0; val < (ROWS * COLUMNS / 2); val++ ){
 		    	for( int i = 0; i < 2; i++ ){
 		    		deck.add(val);
 		    		vals.add(val);
 		    	}
+	    	}
+	    	for( int i = 0; i < 2; i++ ){
+	    		deck.add(-1);
+	    		deck.add(-2);
 	    	}
 	    	
 	    	// now fill the table from the list
@@ -337,23 +357,123 @@ public class Model
 		return this.match;
 	}
 	
-	public static Participant getOpponentFromMatch(TurnBasedMatch match){
-		//TODO: get opponent
-		return match.getParticipants().get(1);
+	public String getMyPartId(){
+		return this.match.getParticipantId(this.myId);
 	}
 	
-//	-(GPGTurnBasedParticipant*)getOpponentFromMatch:(GPGTurnBasedMatch*)match
-//	{
-//	    NSArray *participants = match.participants;
-//	    GPGTurnBasedParticipant *opponent = [participants objectAtIndex:0];
-//	    
-//	    NSString *myId = match.localParticipantId;
-//	    if([myId isEqualToString:opponent.participantId] && [participants count] > 1){
-//	        opponent = [participants objectAtIndex:1];
-//	    }
-//	    
-//	    return opponent;
-//	}
+	public boolean isMyTurn(){
+		try{
+			if( this.match.getTurnStatus() != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN){
+				return false;
+			}
+			
+			Participant opponentPart = getOpponent();
+			ParticipantResult pr = opponentPart.getResult();
+			
+			if( pr == null ){
+				return true;
+			}
+			else if( pr.getResult() == ParticipantResult.MATCH_RESULT_WIN ){
+				return false;
+			}
+			else if( pr.getResult() == ParticipantResult.MATCH_RESULT_LOSS ){
+				return false;
+			}
+			
+			return true;
+		}
+		catch(Exception ex){
+			return false;
+		}
+	}
+	
+	public int getOwnerForMe(Context context){
+		try{
+			boolean myTurn = (this.match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN);
+			
+		    if( myTurn ){
+		        return this.owners_turn;
+		    }
+		    else{
+		        if( this.owners_turn == 1 ){
+		            return 2;
+		        }
+		        else{
+		            return 1;
+		        }
+		    }
+		}
+		catch(Exception ex){
+			Model.showConnectionError(context, "Unable to Load Match");
+			return -1;
+		}
+	}
+	
+	public void flipTurn(){
+		if( this.owners_turn == 1 ){
+	        this.owners_turn = 2;
+	    }
+	    else{
+	        this.owners_turn = 1;
+	    }
+	}
+	
+	public static Model submitNewMatch(TurnBasedMatch match, GoogleApiClient mGoogleApiClient, final Context context){
+		// submit the match to gpg with initial data
+		try{
+			String myId = Games.Players.getCurrentPlayer(mGoogleApiClient).getPlayerId();
+			Model model = new Model(match, myId);
+			byte[] data = model.storeToData();
+			String participantId = match.getParticipantId(myId);
+			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(), data, participantId).setResultCallback(new ResultCallback<UpdateMatchResult>(){
+				  @Override
+				  public void onResult(UpdateMatchResult updateMatchResult) {
+					  if( !updateMatchResult.getStatus().isSuccess() ){
+						  new AlertDialog.Builder(context)
+				    	    .setTitle("Unable To Submit Move")
+				    	    .setMessage("Check you internet connection, or try again later.")
+				    	    .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+				    	        public void onClick(DialogInterface dialog, int which) { 
+				    	            // do nothing
+				    	        }
+				    	     })
+				    	    .show();
+					  }
+				  }
+			  });
+			
+			return model;
+		}
+		catch(IllegalStateException ex){
+			Model.showConnectionError(context, "Unable to Start New Match");
+		}
+		
+		return null;
+	}
+	
+	public String getMatchId(){
+		return this.match.getMatchId();
+	}
+	
+	public Participant getOpponent(){
+		return getOpponentFromMatch(this.match, this.myId);
+	}
+	
+	public static Participant getOpponentFromMatch(TurnBasedMatch match, String myId){
+		// get the other participant in the match		
+		List<Participant> participants = match.getParticipants();
+		
+		Participant opponent = participants.get(0);
+		if(myId != null){
+			String myPartId = match.getParticipantId(myId);
+			
+			if( myPartId != null && myPartId.equals(opponent.getParticipantId()) && participants.size() > 1 ){
+				opponent = participants.get(1);
+			}
+		}
+		
+		return opponent;
+	}
 	
     public int getNextPlayerOption(int column, int owner){
         int remaining = this.deck.size();
@@ -523,4 +643,8 @@ public class Model
 
     	return false;
     }
+	
+	public static void showConnectionError(Context context, String title){
+		Toast.makeText(context, "Check you internet connection, or try again later.", Toast.LENGTH_LONG).show();
+	}
 }

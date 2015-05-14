@@ -6,13 +6,15 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.gmail.tylercap4.connections.MainMenu" >
+    tools:context="com.gmail.tylercap4.connections.MainMenu"
+    android:background="@color/back_color" >
 
     <ListView android:id="@+id/games_list"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
+        android:layout_gravity="start" 
         android:choiceMode="singleChoice"
-        android:dividerHeight="2dp"/>
+        android:dividerHeight="1dp"
+        android:divider="@color/match_text"/>
 
 </RelativeLayout>
