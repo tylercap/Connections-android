@@ -15,13 +15,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.multiplayer.Participant;
-import com.google.android.gms.games.multiplayer.ParticipantResult;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer.UpdateMatchResult;
 
 public class Model 
 {
-	public static final Map<String,Model> ID_TO_MODEL_MAP = new HashMap<String,Model>();
+	private static final Map<String,Model> ID_TO_MODEL_MAP = new HashMap<String,Model>();
 	public static final String ID_TAG = "MATCH_ID";
 	
 	public static final int ROWS = 9;
@@ -39,6 +38,16 @@ public class Model
 	private int[]				owner2_cards;
 	
 	private int owners_turn;
+	
+	public static Model getModelFromId( String id ){
+		Model model = Model.ID_TO_MODEL_MAP.get(id);
+		
+		return model;
+	}
+	
+	public void setMatch(TurnBasedMatch match){
+		this.match = match;
+	}
 
 	public Model( TurnBasedMatch match, String myId ){
 		this.myId = myId;
@@ -363,24 +372,28 @@ public class Model
 	
 	public boolean isMyTurn(){
 		try{
-			if( this.match.getTurnStatus() != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN){
-				return false;
-			}
 			
-			Participant opponentPart = getOpponent();
-			ParticipantResult pr = opponentPart.getResult();
-			
-			if( pr == null ){
+			if( this.match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN ){
 				return true;
 			}
-			else if( pr.getResult() == ParticipantResult.MATCH_RESULT_WIN ){
-				return false;
-			}
-			else if( pr.getResult() == ParticipantResult.MATCH_RESULT_LOSS ){
+			else if( this.match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN ){
 				return false;
 			}
 			
-			return true;
+			return this.getMyPartId().equals( this.match.getPendingParticipantId() );
+			
+//			Participant opponentPart = getOpponent();
+//			ParticipantResult pr = opponentPart.getResult();
+//			
+//			if( pr == null ){
+//				return true;
+//			}
+//			else if( pr.getResult() == ParticipantResult.MATCH_RESULT_WIN ){
+//				return false;
+//			}
+//			else if( pr.getResult() == ParticipantResult.MATCH_RESULT_LOSS ){
+//				return false;
+//			}
 		}
 		catch(Exception ex){
 			return false;
@@ -389,7 +402,7 @@ public class Model
 	
 	public int getOwnerForMe(Context context){
 		try{
-			boolean myTurn = (this.match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN);
+			boolean myTurn = isMyTurn();
 			
 		    if( myTurn ){
 		        return this.owners_turn;

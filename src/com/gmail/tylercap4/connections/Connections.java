@@ -13,12 +13,15 @@ import com.google.android.gms.games.Games;
 import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.ParticipantResult;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer.InitiateMatchResult;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer.LoadMatchResult;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer.UpdateMatchResult;
 import com.google.android.gms.plus.Plus;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -160,7 +163,25 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 	}
 	
 	private void assignModelFromId( String id ){
-		this.model = Model.ID_TO_MODEL_MAP.get(id);
+		this.model = Model.getModelFromId(id);
+		
+		final ProgressDialog progress = ProgressDialog.show(this, "Loading Game",
+			    "Please wait while your game loads", true);
+		
+		Games.TurnBasedMultiplayer.loadMatch(mGoogleApiClient, id)
+			.setResultCallback(new ResultCallback<TurnBasedMultiplayer.LoadMatchResult>(){
+				@Override
+				public void onResult(LoadMatchResult result) {
+					if( result.getStatus().isSuccess() ){
+						Connections.this.model.setMatch(result.getMatch());
+						finishLoadModel();						
+						progress.dismiss();
+					}
+					else{
+						Connections.this.finish();
+					}
+				}
+			});
 	}
 	
 	private void loadModel(){
@@ -186,7 +207,9 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 			finish();
 			return;
 		}
-		
+	}
+	
+	private void finishLoadModel(){		
 		// set which owner we are
 		this.owner = this.model.getOwnerForMe(this);
 		if( this.owner < 1 || this.owner > 2 ){
@@ -227,6 +250,7 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
         	view.addView(child);
         	player_cards[i] = child;
     	}
+    	this.setUpResignButton();
 	}
 
     private void setUpButton( IndexedButton button ){
@@ -375,6 +399,7 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     			this.finish();
     		}
     	}
+    	this.setUpResignButton();
 	}
     
     private void doRematch(){
