@@ -3,6 +3,8 @@ package com.gmail.tylercap4.connections;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.gmail.tylercap4.connections.basegameutils.BaseGameUtils;
 import com.google.android.gms.common.ConnectionResult;
@@ -107,8 +109,21 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
         matches = new LinkedList<TurnBasedMatch>();
         invitations = new LinkedList<Invitation>();
         
-        reloadSignIn();    	
-		updateSignIn();
+        reloadSignIn(); 
+        updateSignIn();
+		
+		Timer timer = new Timer();
+		TimerTask intervalUpdate = new TimerTask(){
+			@Override
+			public void run() {
+				MainMenu.this.runOnUiThread(new Runnable() {
+				    public void run() {
+				    	updateSignIn();
+				    }
+				});
+			}
+		};
+		timer.schedule(intervalUpdate, 5000, 60000);
 	}
 	
 	private void updateSignIn(){
@@ -192,6 +207,17 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
     	new Thread(r).start();
     }
 	
+	public void onStop(){
+		super.onStop();
+		
+		if( mGoogleApiClient != null && mGoogleApiClient.isConnected() ){
+			Games.Invitations.unregisterInvitationListener(mGoogleApiClient);
+	    	Games.TurnBasedMultiplayer.unregisterMatchUpdateListener(mGoogleApiClient);
+
+	    	mGoogleApiClient.disconnect();
+		}
+	}
+	
 	private void doOnConnected(){
 		if( mGoogleApiClient == null || !mGoogleApiClient.isConnected() ){
 			signedOut();
@@ -256,6 +282,12 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 							else
 							{
 								try{
+									LinkedList<String> my_turn_strings = new LinkedList<String>();
+									LinkedList<TurnBasedMatch> my_turn_matches = new LinkedList<TurnBasedMatch>();
+									LinkedList<String> their_turn_strings = new LinkedList<String>();
+									LinkedList<TurnBasedMatch> their_turn_matches = new LinkedList<TurnBasedMatch>();
+									LinkedList<String> completed_strings = new LinkedList<String>();
+									LinkedList<TurnBasedMatch> completed_matches = new LinkedList<TurnBasedMatch>();
 									game_strings = new LinkedList<String>();
 									matches = new LinkedList<TurnBasedMatch>();
 									invitations = new LinkedList<Invitation>();
@@ -274,67 +306,84 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 										
 									for( int i = 0; i < result.getMatches().getMyTurnMatches().getCount(); i++ ){
 										TurnBasedMatch match = result.getMatches().getMyTurnMatches().get( i ); 
-										matches.add( match );
 										Participant opponentPart = Model.getOpponentFromMatch(match, myId);
 										String opponent = opponentPart.getDisplayName();
 										ParticipantResult pr = opponentPart.getResult();
 										
 										if( pr == null ){
-											game_strings.add(opponent + ": Your Turn");
+											my_turn_matches.add(match);
+											my_turn_strings.add(opponent + ": Your Turn");
 										}
 										else if( pr.getResult() == ParticipantResult.MATCH_RESULT_WIN ){
-											game_strings.add(opponent + ": You Lost");
+											completed_matches.add(match);
+											completed_strings.add(opponent + ": You Lost");
 										}
 										else if( pr.getResult() == ParticipantResult.MATCH_RESULT_LOSS ){
-											game_strings.add(opponent + ": You Won!");
+											completed_matches.add(match);
+											completed_strings.add(opponent + ": You Won!");
 										}
 										else{
-											game_strings.add(opponent + ": Your Turn");
+											my_turn_matches.add(match);
+											my_turn_strings.add(opponent + ": Your Turn");
 										}
 									}
 										
 									for( int i = 0; i < result.getMatches().getTheirTurnMatches().getCount(); i++ ){
-										TurnBasedMatch match = result.getMatches().getTheirTurnMatches().get( i );								 
-										matches.add( match );
+										TurnBasedMatch match = result.getMatches().getTheirTurnMatches().get( i );
 										Participant opponentPart = Model.getOpponentFromMatch(match, myId);
 										String opponent = opponentPart.getDisplayName();
 										ParticipantResult pr = opponentPart.getResult();
 										
 										if( pr == null ){
-											game_strings.add(opponent + ": Their Turn");
+											their_turn_matches.add(match);
+											their_turn_strings.add(opponent + ": Their Turn");
 										}
 										else if( pr.getResult() == ParticipantResult.MATCH_RESULT_WIN ){
-											game_strings.add(opponent + ": You Lost");
+											completed_matches.add(match);
+											completed_strings.add(opponent + ": You Lost");
 										}
 										else if( pr.getResult() == ParticipantResult.MATCH_RESULT_LOSS ){
-											game_strings.add(opponent + ": You Won!");
+											completed_matches.add(match);
+											completed_strings.add(opponent + ": You Won!");
 										}
 										else{
-											game_strings.add(opponent + ": Their Turn");
+											their_turn_matches.add(match);
+											their_turn_strings.add(opponent + ": Their Turn");
 										}
 									}
 									
 									for( int i = 0; i < result.getMatches().getCompletedMatches().getCount(); i++ ){
 										TurnBasedMatch match = result.getMatches().getCompletedMatches().get( i ); 
-										matches.add( match );
 	//									String myPartId = match.getParticipantId(myId);
 										Participant opponentPart = Model.getOpponentFromMatch(match, myId);
 										String opponent = opponentPart.getDisplayName();
 										ParticipantResult pr = opponentPart.getResult();
 										
 										if( pr == null ){
-											game_strings.add(opponent + ": Completed");
+											completed_matches.add(match);
+											completed_strings.add(opponent + ": Expired");
 										}
 										else if( pr.getResult() == ParticipantResult.MATCH_RESULT_WIN ){
-											game_strings.add(opponent + ": You Lost");
+											completed_matches.add(match);
+											completed_strings.add(opponent + ": You Lost");
 										}
 										else if( pr.getResult() == ParticipantResult.MATCH_RESULT_LOSS ){
-											game_strings.add(opponent + ": You Won!");
+											completed_matches.add(match);
+											completed_strings.add(opponent + ": You Won!");
 										}
 										else{
-											game_strings.add(opponent + ": Completed");
+											completed_matches.add(match);
+											completed_strings.add(opponent + ": Expired");
 										}
 									}
+									
+									matches.addAll(my_turn_matches);
+									matches.addAll(their_turn_matches);
+									matches.addAll(completed_matches);
+									
+									game_strings.addAll(my_turn_strings);
+									game_strings.addAll(their_turn_strings);
+									game_strings.addAll(completed_strings);
 									
 									reloadDisplay();
 								}

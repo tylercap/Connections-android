@@ -372,7 +372,9 @@ public class Model
 	
 	public boolean isMyTurn(){
 		try{
-			
+			if( this.match.getStatus() != TurnBasedMatch.MATCH_STATUS_ACTIVE ){
+				return false;
+			}
 			if( this.match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN ){
 				return true;
 			}
@@ -402,7 +404,17 @@ public class Model
 	
 	public int getOwnerForMe(Context context){
 		try{
-			boolean myTurn = isMyTurn();
+			boolean myTurn = this.getMyPartId().equals( this.match.getPendingParticipantId() );
+			if( this.match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN ){
+				myTurn = true;
+			}
+			else if( this.match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN ){
+				myTurn = false;
+			}
+			
+			if( this.match.getStatus() != TurnBasedMatch.MATCH_STATUS_ACTIVE ){
+				myTurn = !myTurn;
+			}
 			
 		    if( myTurn ){
 		        return this.owners_turn;

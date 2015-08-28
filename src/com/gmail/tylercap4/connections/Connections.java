@@ -298,7 +298,14 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     }
     
     private void highlightTileClicked( IndexedButton button ){
-    	if( button.getValue() == -2 ){
+    	boolean lightning = false;
+    	for( IndexedButton player_button:this.player_cards ){
+    		if( player_button.isHighlighted() && player_button.getValue() == -2 ){
+    			lightning = true;
+    			break;
+    		}
+    	}
+    	if( lightning ){
 			// remove card
     		model.setOwnerAt( 0, button.getRow(), button.getColumn() );
 	    	button.setOwner(0);
@@ -435,6 +442,23 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     }
 
     private void doResign(){
+    	new AlertDialog.Builder(Connections.this)
+	    .setTitle("Resign")
+	    .setMessage("Are you sure you would like to resign?")
+	    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) { 
+	            doResignConfirmed();
+	        }
+	     })
+	    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) { 
+	            // do nothing
+	        }
+	     })
+	     .show();
+    }
+    
+    private void doResignConfirmed(){
     	byte[] data = model.storeToData();
 		Participant opponent = model.getOpponent();
 		

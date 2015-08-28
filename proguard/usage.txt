@@ -1,3 +1,4 @@
+android.UnusedStub
 android.support.annotation.AnimRes
 android.support.annotation.AnimatorRes
 android.support.annotation.AnyRes
@@ -1356,7 +1357,7 @@ com.gmail.tylercap4.connections.Model:
     public static final int ROWS
     public static final int COLUMNS
     public static final int PLAYER_CARDS
-    357:357:public com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch getMatch()
+    366:366:public com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch getMatch()
 com.gmail.tylercap4.connections.R
 com.gmail.tylercap4.connections.R$attr
 com.gmail.tylercap4.connections.R$color
@@ -2870,8 +2871,6 @@ com.google.android.gms.games.internal.GamesClientImpl:
     public varargs void a(com.google.android.gms.common.api.BaseImplementation$b,boolean,java.lang.String[])
     public void o(java.lang.String,int)
     public android.content.Intent lo()
-    public void lp()
-    public void lq()
     public void c(com.google.android.gms.common.api.d)
     public void lr()
     public void d(com.google.android.gms.common.api.d)
@@ -2889,7 +2888,6 @@ com.google.android.gms.games.internal.GamesClientImpl:
     public void a(com.google.android.gms.common.api.BaseImplementation$b,java.lang.String,java.lang.String)
     public void f(com.google.android.gms.common.api.BaseImplementation$b,java.lang.String)
     public void bA(java.lang.String)
-    public void g(com.google.android.gms.common.api.BaseImplementation$b,java.lang.String)
     public android.content.Intent b(int,int,boolean)
     public void a(com.google.android.gms.common.api.d,com.google.android.gms.common.api.d,com.google.android.gms.common.api.d,com.google.android.gms.games.multiplayer.realtime.RoomConfig)
     public void b(com.google.android.gms.common.api.d,com.google.android.gms.common.api.d,com.google.android.gms.common.api.d,com.google.android.gms.games.multiplayer.realtime.RoomConfig)
@@ -3018,7 +3016,6 @@ com.google.android.gms.games.internal.GamesClientImpl$LoadGameInstancesResultImp
 com.google.android.gms.games.internal.GamesClientImpl$LoadGameSearchSuggestionsResultImpl
 com.google.android.gms.games.internal.GamesClientImpl$LoadGamesResultImpl
 com.google.android.gms.games.internal.GamesClientImpl$LoadInvitationsResultImpl
-com.google.android.gms.games.internal.GamesClientImpl$LoadMatchResultImpl
 com.google.android.gms.games.internal.GamesClientImpl$LoadOwnerCoverPhotoUrisResultImpl
 com.google.android.gms.games.internal.GamesClientImpl$LoadPlayerScoreResultImpl
 com.google.android.gms.games.internal.GamesClientImpl$LoadPlayersResultImpl
@@ -3078,7 +3075,6 @@ com.google.android.gms.games.internal.GamesClientImpl$SubmitScoreBinderCallbacks
 com.google.android.gms.games.internal.GamesClientImpl$SubmitScoreResultImpl
 com.google.android.gms.games.internal.GamesClientImpl$TurnBasedMatchCanceledBinderCallbacks
 com.google.android.gms.games.internal.GamesClientImpl$TurnBasedMatchLeftBinderCallbacks
-com.google.android.gms.games.internal.GamesClientImpl$TurnBasedMatchLoadedBinderCallbacks
 com.google.android.gms.games.internal.GamesClientImpl$UpdateAchievementResultImpl
 com.google.android.gms.games.internal.GamesClientImpl$UpdateRequestsResultImpl
 com.google.android.gms.games.internal.GamesConstants
@@ -3230,7 +3226,6 @@ com.google.android.gms.games.internal.api.GamesMetadataImpl$LoadGamesImpl
 com.google.android.gms.games.internal.api.GamesMetadataImpl$LoadGamesImpl$1
 com.google.android.gms.games.internal.api.InvitationsImpl:
     public android.content.Intent getInvitationInboxIntent(com.google.android.gms.common.api.GoogleApiClient)
-    public void unregisterInvitationListener(com.google.android.gms.common.api.GoogleApiClient)
     public com.google.android.gms.common.api.PendingResult loadInvitations(com.google.android.gms.common.api.GoogleApiClient)
     public com.google.android.gms.common.api.PendingResult loadInvitations(com.google.android.gms.common.api.GoogleApiClient,int)
 com.google.android.gms.games.internal.api.InvitationsImpl$1
@@ -3434,7 +3429,6 @@ com.google.android.gms.games.internal.api.SnapshotsImpl$LoadImpl$1
 com.google.android.gms.games.internal.api.SnapshotsImpl$OpenImpl
 com.google.android.gms.games.internal.api.SnapshotsImpl$OpenImpl$1
 com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl:
-    public void unregisterMatchUpdateListener(com.google.android.gms.common.api.GoogleApiClient)
     public android.content.Intent getSelectOpponentsIntent(com.google.android.gms.common.api.GoogleApiClient,int,int)
     public void dismissInvitation(com.google.android.gms.common.api.GoogleApiClient,java.lang.String)
     public int getMaxMatchDataSize(com.google.android.gms.common.api.GoogleApiClient)
@@ -3444,8 +3438,6 @@ com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl:
     public com.google.android.gms.common.api.PendingResult leaveMatchDuringTurn(com.google.android.gms.common.api.GoogleApiClient,java.lang.String,java.lang.String)
     public com.google.android.gms.common.api.PendingResult cancelMatch(com.google.android.gms.common.api.GoogleApiClient,java.lang.String)
     public void dismissMatch(com.google.android.gms.common.api.GoogleApiClient,java.lang.String)
-    public com.google.android.gms.common.api.PendingResult loadMatch(com.google.android.gms.common.api.GoogleApiClient,java.lang.String)
-com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$10
 com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$11
 com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$12
 com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$13
@@ -3456,8 +3448,6 @@ com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$CancelMatchIm
 com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$CancelMatchImpl$1
 com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$LeaveMatchImpl
 com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$LeaveMatchImpl$1
-com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$LoadMatchImpl
-com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$LoadMatchImpl$1
 com.google.android.gms.games.internal.api.TurnBasedMultiplayerImpl$UpdateMatchImpl$1:
     public com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch getMatch()
 com.google.android.gms.games.internal.constants.AchievementState
@@ -3581,7 +3571,6 @@ com.google.android.gms.games.multiplayer.InvitationEntity:
     public boolean isDataValid()
 com.google.android.gms.games.multiplayer.Invitations:
     public abstract android.content.Intent getInvitationInboxIntent(com.google.android.gms.common.api.GoogleApiClient)
-    public abstract void unregisterInvitationListener(com.google.android.gms.common.api.GoogleApiClient)
     public abstract com.google.android.gms.common.api.PendingResult loadInvitations(com.google.android.gms.common.api.GoogleApiClient)
     public abstract com.google.android.gms.common.api.PendingResult loadInvitations(com.google.android.gms.common.api.GoogleApiClient,int)
 com.google.android.gms.games.multiplayer.Invitations$LoadInvitationsResult
@@ -3742,7 +3731,6 @@ com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchRef:
     public java.util.ArrayList getParticipantIds()
     public com.google.android.gms.games.multiplayer.Participant getParticipant(java.lang.String)
 com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer:
-    public abstract void unregisterMatchUpdateListener(com.google.android.gms.common.api.GoogleApiClient)
     public abstract android.content.Intent getSelectOpponentsIntent(com.google.android.gms.common.api.GoogleApiClient,int,int)
     public abstract void dismissInvitation(com.google.android.gms.common.api.GoogleApiClient,java.lang.String)
     public abstract int getMaxMatchDataSize(com.google.android.gms.common.api.GoogleApiClient)
@@ -3755,10 +3743,8 @@ com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer:
     public abstract com.google.android.gms.common.api.PendingResult cancelMatch(com.google.android.gms.common.api.GoogleApiClient,java.lang.String)
     public abstract void dismissMatch(com.google.android.gms.common.api.GoogleApiClient,java.lang.String)
     public abstract com.google.android.gms.common.api.PendingResult loadMatchesByStatus(com.google.android.gms.common.api.GoogleApiClient,int,int[])
-    public abstract com.google.android.gms.common.api.PendingResult loadMatch(com.google.android.gms.common.api.GoogleApiClient,java.lang.String)
 com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$CancelMatchResult
 com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$LeaveMatchResult
-com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$LoadMatchResult
 com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$UpdateMatchResult:
     public abstract com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch getMatch()
 com.google.android.gms.games.quest.Milestone:
