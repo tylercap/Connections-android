@@ -2,8 +2,8 @@ package com.gmail.tylercap4.connections;
 
 import java.util.LinkedList;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
+import com.flurry.android.*;
+import com.flurry.android.ads.*;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,8 +39,14 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 {		
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String MATCH_ID_TAG = "MatchID";
+    private static final String FLURRY_API_KEY = "8Q8WG6WNS4DYWPSWW7T4";
     
-    private AdView adMobView;
+    private FlurryAdInterstitial mFlurryAdInterstitial = null;
+    private String intAdName = "CONNECT_ANDROID_INTERSTITIAL";
+    
+    private RelativeLayout mBanner;
+    private FlurryAdBanner mFlurryAdBanner = null;
+    private String bannerAdName = "CONNECT_ANDROID_BANNER";
     
 	/* Client used to interact with Google APIs. */
 	protected GoogleApiClient mGoogleApiClient;
@@ -59,15 +66,39 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_connections);
 		
+		// configure Flurry
+        FlurryAgent.setLogEnabled(false);
+
+        // init Flurry
+        FlurryAgent.init(this, FLURRY_API_KEY);
+		
 		// Load the banner ad
-        adMobView = (AdView) findViewById(R.id.adView);
-        adMobView.loadAd(new AdRequest.Builder().build());
+//        adMobView = (AdView) findViewById(R.id.adView);
+//        adMobView.loadAd(new AdRequest.Builder().build());
+	}
+
+	@Override
+    protected void onDestroy() {
+		super.onDestroy();
+        mFlurryAdBanner.destroy();
+        mFlurryAdInterstitial.destroy();
+    }
+	
+	@Override
+	protected void onStart(){
+		super.onStart();
+		FlurryAgent.onStartSession(this);
+	}
+	
+	@Override
+	protected void onStop(){
+		super.onStop();
+		FlurryAgent.onEndSession(this);
 	}
     
     @Override
     protected void onPause(){
     	super.onPause();
-        adMobView.pause();
         
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
@@ -83,7 +114,18 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 	@Override
 	protected void onResume(){
 		super.onResume();
-        adMobView.resume();
+		mBanner = (RelativeLayout)findViewById(R.id.banner);
+        mFlurryAdBanner = new FlurryAdBanner(this, mBanner, bannerAdName);
+ 
+        // optional allow us to get callbacks for ad events, 
+        mFlurryAdBanner.setListener(bannerAdListener);
+        
+        mFlurryAdInterstitial = new FlurryAdInterstitial(this, intAdName);
+
+        // allow us to get callbacks for ad events
+        mFlurryAdInterstitial.setListener(interstitialAdListener);
+
+        mFlurryAdBanner.fetchAndDisplayAd();
         
         mGoogleApiClient = new GoogleApiClient.Builder(this)
         .addConnectionCallbacks(this)
@@ -407,6 +449,11 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     		}
     	}
     	this.setUpResignButton();
+    	
+    	int rand = (int) (Math.random() * 10);
+    	if( rand < 2 && this.mFlurryAdInterstitial != null ){
+    		this.mFlurryAdInterstitial.fetchAd();
+    	}
 	}
     
     private void doRematch(){
@@ -558,6 +605,108 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     		}
         }
     }
+    
+    FlurryAdInterstitialListener interstitialAdListener = new FlurryAdInterstitialListener() {
+
+        @Override
+        public void onFetched(FlurryAdInterstitial adInterstitial) {
+            adInterstitial.displayAd();
+        }
+
+        @Override
+        public void onError(FlurryAdInterstitial adInterstitial, FlurryAdErrorType adErrorType, int errorCode) {
+            adInterstitial.destroy();
+        }
+        //..
+        //the remainder of listener callbacks 
+
+		@Override
+		public void onAppExit(FlurryAdInterstitial arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onClicked(FlurryAdInterstitial arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onClose(FlurryAdInterstitial arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onDisplay(FlurryAdInterstitial arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRendered(FlurryAdInterstitial arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onVideoCompleted(FlurryAdInterstitial arg0) {
+			// Auto-generated method stub
+			
+		}
+    };
+    
+    FlurryAdBannerListener bannerAdListener = new FlurryAdBannerListener() {
+        
+        @Override
+        public void onFetched(FlurryAdBanner adBanner) {
+               adBanner.displayAd();
+        }
+
+        @Override
+        public void onError(FlurryAdBanner adBanner, FlurryAdErrorType adErrorType, int errorCode) {
+             adBanner.destroy();
+        }
+       //..
+       //the remainder of the listener callback methods
+
+		@Override
+		public void onAppExit(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onClicked(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onCloseFullscreen(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRendered(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onShowFullscreen(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onVideoCompleted(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+    };
 
 	private String getEmoji(int value){
 		int unicode;

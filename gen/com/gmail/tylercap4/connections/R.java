@@ -476,9 +476,9 @@ containing a value of this type.
     }
     public static final class id {
         public static final int action_sign_in=0x7f07006b;
-        public static final int adView=0x7f070017;
         public static final int adjust_height=0x7f070002;
         public static final int adjust_width=0x7f070001;
+        public static final int banner=0x7f070017;
         public static final int book_now=0x7f070012;
         public static final int buyButton=0x7f07000c;
         public static final int buy_now=0x7f070011;
