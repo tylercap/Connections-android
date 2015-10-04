@@ -1,0 +1,9 @@
+# view AndroidManifest.xml #generated:37
+-keep class com.flurry.android.FlurryFullscreenTakeoverActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:32
+-keep class com.gmail.tylercap4.connections.Connections { <init>(...); }
+
+# view AndroidManifest.xml #generated:23
+-keep class com.gmail.tylercap4.connections.MainMenu { <init>(...); }
+

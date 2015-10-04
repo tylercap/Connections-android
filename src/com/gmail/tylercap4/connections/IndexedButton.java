@@ -8,16 +8,18 @@ public class IndexedButton extends Button {
 	private final int column;
 	private int value;
 	
-	private int owner;
+	private int cardOwner;
+	private int deviceOwner;
 	private boolean highlighted;
 
-	public IndexedButton(Context context, int row, int column, int value, int owner) {
+	public IndexedButton(Context context, int row, int column, int value, int cardOwner, int deviceOwner) {
 		super(context);
 		
 		this.row = row;
 		this.column = column;
 		this.value = value;
-		this.owner = owner;
+		this.cardOwner = cardOwner;
+		this.deviceOwner = deviceOwner;
 		this.highlighted = false;
 	}
 	
@@ -25,11 +27,13 @@ public class IndexedButton extends Button {
 		if( this.highlighted ){
 			setBackgroundResource(R.drawable.highlighted);
 		}
-		else if( this.owner == 1 ){
-			setBackgroundResource(R.drawable.player1);
-		}
-		else if( this.owner == 2 ){
-			setBackgroundResource(R.drawable.player2);
+		else if( this.cardOwner == 1 || this.cardOwner == 2 ){
+			if( this.cardOwner == this.deviceOwner ){
+				setBackgroundResource(R.drawable.player1);				
+			}
+			else{
+				setBackgroundResource(R.drawable.player2);
+			}
 		}
 		else{
 			setBackgroundResource(R.drawable.custom_button);
@@ -51,8 +55,8 @@ public class IndexedButton extends Button {
 		this.value = value;
 	}
 	
-	public void setOwner( int owner ){
-		this.owner = owner;
+	public void setCardOwner( int cardOwner ){
+		this.cardOwner = cardOwner;
 		this.updateBackground();
 	}
 	

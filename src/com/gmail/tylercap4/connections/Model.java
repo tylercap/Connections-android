@@ -412,9 +412,9 @@ public class Model
 				myTurn = false;
 			}
 			
-			if( this.match.getStatus() != TurnBasedMatch.MATCH_STATUS_ACTIVE ){
-				myTurn = !myTurn;
-			}
+//			if( this.match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE ){
+//				myTurn = !myTurn;
+//			}
 			
 		    if( myTurn ){
 		        return this.owners_turn;

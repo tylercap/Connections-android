@@ -267,7 +267,7 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     			int card_owner = model.getOwnerAt(row, column);
     			int val = model.getValueAt(row, column);
     			
-    			IndexedButton button = new IndexedButton(this, row, column, val, card_owner);
+    			IndexedButton button = new IndexedButton(this, row, column, val, card_owner, this.owner);
     			
     			setUpButton(button);
             	
@@ -284,7 +284,7 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 			
 			int val = model.getPlayerCardAt( this.owner, i );
 		
-			IndexedButton child = new IndexedButton(this, -1, i, val, this.owner);
+			IndexedButton child = new IndexedButton(this, -1, i, val, this.owner, this.owner);
         	setUpButton( child );
 			if( view.getChildCount() > 0 )
 				view.removeAllViews();
@@ -350,11 +350,11 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     	if( lightning ){
 			// remove card
     		model.setOwnerAt( 0, button.getRow(), button.getColumn() );
-	    	button.setOwner(0);
+	    	button.setCardOwner(0);
 		}
     	else{
 	    	model.setOwnerAt( this.owner, button.getRow(), button.getColumn() );
-	    	button.setOwner(this.owner);
+	    	button.setCardOwner(this.owner);
     	}
     	
     	for( int i = 0; i < Model.PLAYER_CARDS; i++ ){
@@ -381,7 +381,6 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     		results.add(oppResult);
     		
     		try{
-    			this.my_turn = false;
 	    		Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, model.getMatchId(), data, results)
 	    								  .setResultCallback(new ResultCallback<UpdateMatchResult>(){
 	    									  @Override
@@ -412,6 +411,8 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 	    										  }
 	    									  }
 	    								  });
+
+    			this.my_turn = false;
 	    		
     		}
     		catch(Exception ex){
@@ -451,7 +452,7 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     	this.setUpResignButton();
     	
     	int rand = (int) (Math.random() * 10);
-    	if( rand < 2 && this.mFlurryAdInterstitial != null ){
+    	if( rand < 3 && this.mFlurryAdInterstitial != null ){
     		this.mFlurryAdInterstitial.fetchAd();
     	}
 	}
