@@ -9809,32 +9809,36 @@ com.gmail.tylercap4.connections.MainMenu$10 -> com.gmail.tylercap4.connections.M
     com.gmail.tylercap4.connections.MainMenu this$0 -> a
     com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig val$tbmc -> b
     void run() -> run
-com.gmail.tylercap4.connections.MainMenu$2 -> com.gmail.tylercap4.connections.MainMenu$3:
+com.gmail.tylercap4.connections.MainMenu$11 -> com.gmail.tylercap4.connections.MainMenu$3:
+    com.gmail.tylercap4.connections.MainMenu this$0 -> a
+    com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch val$match -> b
+    void run() -> run
+com.gmail.tylercap4.connections.MainMenu$2 -> com.gmail.tylercap4.connections.MainMenu$4:
     com.gmail.tylercap4.connections.MainMenu this$0 -> a
     void run() -> run
-com.gmail.tylercap4.connections.MainMenu$3 -> com.gmail.tylercap4.connections.MainMenu$4:
+com.gmail.tylercap4.connections.MainMenu$3 -> com.gmail.tylercap4.connections.MainMenu$5:
     com.gmail.tylercap4.connections.MainMenu this$0 -> a
     void onResult(com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer$LoadMatchesResult) -> a
     void onResult(com.google.android.gms.common.api.Result) -> onResult
-com.gmail.tylercap4.connections.MainMenu$4 -> com.gmail.tylercap4.connections.MainMenu$5:
+com.gmail.tylercap4.connections.MainMenu$4 -> com.gmail.tylercap4.connections.MainMenu$6:
     com.gmail.tylercap4.connections.MainMenu this$0 -> a
     com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch val$match -> b
     void onClick(android.content.DialogInterface,int) -> onClick
-com.gmail.tylercap4.connections.MainMenu$5 -> com.gmail.tylercap4.connections.MainMenu$6:
+com.gmail.tylercap4.connections.MainMenu$5 -> com.gmail.tylercap4.connections.MainMenu$7:
     com.gmail.tylercap4.connections.MainMenu this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
-com.gmail.tylercap4.connections.MainMenu$6 -> com.gmail.tylercap4.connections.MainMenu$7:
+com.gmail.tylercap4.connections.MainMenu$6 -> com.gmail.tylercap4.connections.MainMenu$8:
     com.gmail.tylercap4.connections.MainMenu this$0 -> a
     com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch val$match -> b
     void onClick(android.content.DialogInterface,int) -> onClick
-com.gmail.tylercap4.connections.MainMenu$7 -> com.gmail.tylercap4.connections.MainMenu$8:
+com.gmail.tylercap4.connections.MainMenu$7 -> com.gmail.tylercap4.connections.MainMenu$9:
     com.gmail.tylercap4.connections.MainMenu this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
-com.gmail.tylercap4.connections.MainMenu$8 -> com.gmail.tylercap4.connections.MainMenu$9:
+com.gmail.tylercap4.connections.MainMenu$8 -> com.gmail.tylercap4.connections.MainMenu$10:
     com.gmail.tylercap4.connections.MainMenu this$0 -> a
     com.google.android.gms.games.multiplayer.Invitation val$invitation -> b
     void onClick(android.content.DialogInterface,int) -> onClick
-com.gmail.tylercap4.connections.MainMenu$9 -> com.gmail.tylercap4.connections.MainMenu$10:
+com.gmail.tylercap4.connections.MainMenu$9 -> com.gmail.tylercap4.connections.MainMenu$11:
     com.gmail.tylercap4.connections.MainMenu this$0 -> a
     boolean val$decline -> b
     com.google.android.gms.games.multiplayer.Invitation val$invitation -> c

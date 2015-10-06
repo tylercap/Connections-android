@@ -367,6 +367,9 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     	}
     	
     	boolean winner = model.checkForWinner( this.owner, button.getRow(), button.getColumn() );
+
+		this.my_turn = false;
+		model.flipTurn();
     	
     	if( winner ){
     		// submit winner
@@ -374,11 +377,12 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     		Participant opponent = model.getOpponent();
     		
     		LinkedList<ParticipantResult> results = new LinkedList<ParticipantResult>();
-    		ParticipantResult myResult = new ParticipantResult(model.getMyPartId(), ParticipantResult.MATCH_RESULT_WIN, 1);
-    		results.add(myResult);
     		
     		ParticipantResult oppResult = new ParticipantResult(opponent.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS, 2);
     		results.add(oppResult);
+    		
+    		ParticipantResult myResult = new ParticipantResult(model.getMyPartId(), ParticipantResult.MATCH_RESULT_WIN, 1);
+    		results.add(myResult);
     		
     		try{
 	    		Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, model.getMatchId(), data, results)
@@ -411,8 +415,6 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
 	    										  }
 	    									  }
 	    								  });
-
-    			this.my_turn = false;
 	    		
     		}
     		catch(Exception ex){
@@ -422,8 +424,6 @@ public class Connections extends Activity implements ConnectionCallbacks, OnConn
     	}
     	else{
         	// submit move
-    		this.my_turn = false;
-    		model.flipTurn();
     		byte[] data = model.storeToData();
     		Participant opponent = model.getOpponent();
     		try{

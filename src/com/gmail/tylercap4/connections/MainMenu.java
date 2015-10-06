@@ -567,7 +567,7 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 	
 	private void loadInbox(){
 		Intent inbox = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
-		startActivityForResult( inbox, RC_SELECT_PLAYERS );
+		startActivityForResult( inbox, RC_GAMES_INBOX );
 	}
 	
 	private void openMatch(TurnBasedMatch match){
@@ -646,20 +646,55 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 
             // Get the invitee list.
             final ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
-
-            // Get auto-match criteria.
-            int minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0);
-            if (minAutoMatchPlayers > 0) {
-            	startQuickMatch();
+            
+            if( invitees != null && invitees.size() > 0 ){
+	            // Get auto-match criteria.
+	            int minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0);
+	            if (minAutoMatchPlayers > 0) {
+	            	startQuickMatch();
+	            }
+	            else{
+	            	final TurnBasedMatchConfig tbmc = TurnBasedMatchConfig.builder()
+	                        .addInvitedPlayers(invitees)
+	                        .setAutoMatchCriteria(null)
+	                        .build();
+	
+	                // Create and start the match.
+	            	// wait until we reconnect to call this
+	            	final Runnable r = new Runnable() {
+	            	    public void run() {
+	            	    	while( !mGoogleApiClient.isConnected() ){
+	            	    		try {
+									Thread.sleep(500);
+								} catch (InterruptedException e) {
+									// Auto-generated catch block
+									e.printStackTrace();
+								}
+	            	    	}
+	     
+	            	    	try{
+		            	        Games.TurnBasedMultiplayer
+			                         .createMatch(mGoogleApiClient, tbmc)
+			                         .setResultCallback(new MatchInitiatedCallback());
+	            	    	}
+	            	    	catch(IllegalStateException ex){
+	            	    		Model.showConnectionError(MainMenu.this, "Unable To Create Match");
+	            	    	}
+	            	    }
+	            	};
+	
+	            	new Thread(r).start();
+	            }
             }
-            else{
-            	final TurnBasedMatchConfig tbmc = TurnBasedMatchConfig.builder()
-                        .addInvitedPlayers(invitees)
-                        .setAutoMatchCriteria(null)
-                        .build();
+        }
+        else if (request == RC_GAMES_INBOX) {
+            if (response != RESULT_OK) {
+                // user canceled
+                return;
+            }
 
-                // Create and start the match.
-            	// wait until we reconnect to call this
+            final TurnBasedMatch match = data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
+            if( match != null ){
             	final Runnable r = new Runnable() {
             	    public void run() {
             	    	while( !mGoogleApiClient.isConnected() ){
@@ -671,29 +706,10 @@ public class MainMenu extends Activity implements OnTurnBasedMatchUpdateReceived
 							}
             	    	}
      
-            	    	try{
-	            	        Games.TurnBasedMultiplayer
-		                         .createMatch(mGoogleApiClient, tbmc)
-		                         .setResultCallback(new MatchInitiatedCallback());
-            	    	}
-            	    	catch(IllegalStateException ex){
-            	    		Model.showConnectionError(MainMenu.this, "Unable To Create Match");
-            	    	}
+            	    	openMatch(match);
             	    }
             	};
-
             	new Thread(r).start();
-            }
-        }
-        else if (request == RC_GAMES_INBOX) {
-            if (response != RESULT_OK) {
-                // user canceled
-                return;
-            }
-
-            TurnBasedMatch match = data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
-            if( match != null ){
-            	openMatch(match);
             }
             else{
             	Invitation invite = data.getParcelableExtra(Multiplayer.EXTRA_INVITATION);
