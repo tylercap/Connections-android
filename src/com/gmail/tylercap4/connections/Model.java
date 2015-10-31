@@ -226,7 +226,12 @@ public class Model
 	    
 	    end = string.indexOf(']');
 	    String value = string.substring(start, end);
-	    list.add( Integer.parseInt(value) );
+	    try{
+		    list.add( Integer.parseInt(value) );
+	    }
+	    catch(NumberFormatException ex){
+	    	list.add(-3);
+	    }
 	    
 	    return list;
 	}
